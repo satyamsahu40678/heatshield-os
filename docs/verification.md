@@ -8,6 +8,12 @@ Recorded November 9, 2026 for the first synthetic planning slice.
 - The running Uvicorn server returned HTTP 200 for health, interactive API docs, optimization and a separate validation request. The live demo assigned all twelve tasks and had zero modeled-constraint violations.
 - The source includes GitHub Actions verification; its remote result must be checked separately.
 
+Remote publication is blocked: both the GitHub connector's tree-write endpoint
+and a normal Git push returned HTTP 403 with the connected credentials. No
+remote implementation branch or pull request was created, so remote CI has not
+run. The implementation is committed on local branch `codex/planning-foundation`
+and can be delivered as a source archive or Git bundle.
+
 The managed command sandbox stalls local TestClient event-loop operations. API integration tests were run outside that sandbox; ordinary domain checks and benchmark execution succeeded inside it.
 
 ## Computed smoke benchmark
