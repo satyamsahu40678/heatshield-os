@@ -1,0 +1,26 @@
+name: Planning core
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: uv sync --extra dev --locked
+      - run: uv run --extra dev ruff check .
+      - run: uv run --extra dev ruff format --check .
+      - run: uv run --extra dev pytest
+      - run: uv run heatshield benchmark --count 3 --output benchmark-results.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: synthetic-benchmark
+          path: benchmark-results.json

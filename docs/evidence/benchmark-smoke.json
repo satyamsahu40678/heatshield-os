@@ -1,0 +1,758 @@
+{
+  "mode": "synthetic",
+  "operational_approval_allowed": false,
+  "note": "B0 is an unsafe reference, never a fallback. Metrics apply only to encoded demo constraints. Exposure and workload spread are software-test proxies; they do not measure injuries, physiology, wages, or validated fairness. Scenarios vary fabricated heat conditions and cooling capacity.",
+  "count": 3,
+  "seed": 7,
+  "cp_sat_runtime_median_seconds": 0.46066389599991453,
+  "cp_sat_runtime_p95_seconds": null,
+  "p95_note": "Reported only for at least 20 samples; no statistical superiority claim.",
+  "scenarios": [
+    {
+      "scenario_id": "synthetic-abu-dhabi-7",
+      "scenario_hash": "613216e931308a2b7cae3d9012c99b382ff16209fd144451b3d694d5a10f3d03",
+      "policy_hash": "c02c5fc5d885ed17048173e6ed6b626671bec6debf33e680271e08030dc1853d",
+      "b0_fixed": {
+        "status": "UNSAFE_REFERENCE",
+        "elapsed_seconds": 0.00041064099991672265,
+        "validation": {
+          "valid": false,
+          "review_required": true,
+          "operational_approval_allowed": false,
+          "validator_version": "0.1.0",
+          "violations": [
+            {
+              "code": "MIDDAY_RESTRICTION",
+              "message": "Outdoor assignment overlaps a restricted local interval.",
+              "task_id": "task-01",
+              "worker_id": "worker-01"
+            },
+            {
+              "code": "WBGT_LIMIT",
+              "message": "Heat task exceeds the illustrative workload WBGT limit.",
+              "task_id": "task-01",
+              "worker_id": "worker-01"
+            },
+            {
+              "code": "WBGT_LIMIT",
+              "message": "Heat task exceeds the illustrative workload WBGT limit.",
+              "task_id": "task-02",
+              "worker_id": "worker-03"
+            },
+            {
+              "code": "WBGT_LIMIT",
+              "message": "Heat task exceeds the illustrative workload WBGT limit.",
+              "task_id": "task-03",
+              "worker_id": "worker-05"
+            },
+            {
+              "code": "MIDDAY_RESTRICTION",
+              "message": "Outdoor assignment overlaps a restricted local interval.",
+              "task_id": "task-04",
+              "worker_id": "worker-02"
+            },
+            {
+              "code": "UNINTERRUPTED_HEAT_LIMIT",
+              "message": "Heat task exceeds the worker's modeled uninterrupted allowance.",
+              "task_id": "task-04",
+              "worker_id": "worker-02"
+            },
+            {
+              "code": "WBGT_LIMIT",
+              "message": "Heat task exceeds the illustrative workload WBGT limit.",
+              "task_id": "task-04",
+              "worker_id": "worker-02"
+            },
+            {
+              "code": "WBGT_LIMIT",
+              "message": "Heat task exceeds the illustrative workload WBGT limit.",
+              "task_id": "task-05",
+              "worker_id": "worker-04"
+            },
+            {
+              "code": "WBGT_LIMIT",
+              "message": "Heat task exceeds the illustrative workload WBGT limit.",
+              "task_id": "task-06",
+              "worker_id": "worker-06"
+            },
+            {
+              "code": "MIDDAY_RESTRICTION",
+              "message": "Outdoor assignment overlaps a restricted local interval.",
+              "task_id": "task-07",
+              "worker_id": "worker-01"
+            },
+            {
+              "code": "WBGT_LIMIT",
+              "message": "Heat task exceeds the illustrative workload WBGT limit.",
+              "task_id": "task-07",
+              "worker_id": "worker-01"
+            },
+            {
+              "code": "MIDDAY_RESTRICTION",
+              "message": "Outdoor assignment overlaps a restricted local interval.",
+              "task_id": "task-08",
+              "worker_id": "worker-03"
+            },
+            {
+              "code": "WBGT_LIMIT",
+              "message": "Heat task exceeds the illustrative workload WBGT limit.",
+              "task_id": "task-08",
+              "worker_id": "worker-03"
+            },
+            {
+              "code": "MIDDAY_RESTRICTION",
+              "message": "Outdoor assignment overlaps a restricted local interval.",
+              "task_id": "task-09",
+              "worker_id": "worker-05"
+            },
+            {
+              "code": "WBGT_LIMIT",
+              "message": "Heat task exceeds the illustrative workload WBGT limit.",
+              "task_id": "task-09",
+              "worker_id": "worker-05"
+            },
+            {
+              "code": "MIDDAY_RESTRICTION",
+              "message": "Outdoor assignment overlaps a restricted local interval.",
+              "task_id": "task-10",
+              "worker_id": "worker-02"
+            },
+            {
+              "code": "WBGT_LIMIT",
+              "message": "Heat task exceeds the illustrative workload WBGT limit.",
+              "task_id": "task-10",
+              "worker_id": "worker-02"
+            },
+            {
+              "code": "COOLING_CAPACITY",
+              "message": "Concurrent protected recoveries exceed site cooling capacity.",
+              "task_id": null,
+              "worker_id": null
+            }
+          ],
+          "review_findings": [
+            {
+              "code": "DEMO_POLICY",
+              "message": "Policy thresholds and allowances are unreviewed software-test configuration.",
+              "task_id": null,
+              "worker_id": null
+            },
+            {
+              "code": "SYNTHETIC_SCENARIO",
+              "message": "Synthetic planning only; passing constraints does not approve actual work.",
+              "task_id": null,
+              "worker_id": null
+            },
+            {
+              "code": "SIMULATED_EVIDENCE",
+              "message": "Inputs contain simulated provenance within a synthetic replay.",
+              "task_id": null,
+              "worker_id": null
+            }
+          ],
+          "completed_tasks": 12,
+          "deferred_tasks": 0,
+          "exposure_proxy": 113475,
+          "workload_spread_minutes": 30
+        }
+      },
+      "b1_greedy": {
+        "status": "FEASIBLE",
+        "elapsed_seconds": 0.005534423999961291,
+        "validation": {
+          "valid": true,
+          "review_required": true,
+          "operational_approval_allowed": false,
+          "validator_version": "0.1.0",
+          "violations": [],
+          "review_findings": [
+            {
+              "code": "DEMO_POLICY",
+              "message": "Policy thresholds and allowances are unreviewed software-test configuration.",
+              "task_id": null,
+              "worker_id": null
+            },
+            {
+              "code": "SYNTHETIC_SCENARIO",
+              "message": "Synthetic planning only; passing constraints does not approve actual work.",
+              "task_id": null,
+              "worker_id": null
+            },
+            {
+              "code": "SIMULATED_EVIDENCE",
+              "message": "Inputs contain simulated provenance within a synthetic replay.",
+              "task_id": null,
+              "worker_id": null
+            }
+          ],
+          "completed_tasks": 12,
+          "deferred_tasks": 0,
+          "exposure_proxy": 95625,
+          "workload_spread_minutes": 105
+        }
+      },
+      "b2_cp_sat": {
+        "status": "OPTIMAL",
+        "elapsed_seconds": 0.46066389599991453,
+        "validation": {
+          "valid": true,
+          "review_required": true,
+          "operational_approval_allowed": false,
+          "validator_version": "0.1.0",
+          "violations": [],
+          "review_findings": [
+            {
+              "code": "DEMO_POLICY",
+              "message": "Policy thresholds and allowances are unreviewed software-test configuration.",
+              "task_id": null,
+              "worker_id": null
+            },
+            {
+              "code": "SYNTHETIC_SCENARIO",
+              "message": "Synthetic planning only; passing constraints does not approve actual work.",
+              "task_id": null,
+              "worker_id": null
+            },
+            {
+              "code": "SIMULATED_EVIDENCE",
+              "message": "Inputs contain simulated provenance within a synthetic replay.",
+              "task_id": null,
+              "worker_id": null
+            }
+          ],
+          "completed_tasks": 12,
+          "deferred_tasks": 0,
+          "exposure_proxy": 95625,
+          "workload_spread_minutes": 105
+        },
+        "solver_metadata": {
+          "scenario_hash": "613216e931308a2b7cae3d9012c99b382ff16209fd144451b3d694d5a10f3d03",
+          "policy_hash": "c02c5fc5d885ed17048173e6ed6b626671bec6debf33e680271e08030dc1853d",
+          "schema_version": "1",
+          "solver_version": "9.15.6755",
+          "seed": 7,
+          "elapsed_seconds": 0.460249,
+          "time_limit_seconds": 2.0,
+          "candidate_count": 479,
+          "stages": [
+            {
+              "name": "deferred_tasks",
+              "status": "OPTIMAL",
+              "value": 0,
+              "best_bound": 0.0
+            },
+            {
+              "name": "exposure_proxy",
+              "status": "OPTIMAL",
+              "value": 95625,
+              "best_bound": 95625.0
+            },
+            {
+              "name": "workload_spread_minutes",
+              "status": "OPTIMAL",
+              "value": 105,
+              "best_bound": 105.0
+            }
+          ]
+        },
+        "diagnostics": []
+      }
+    },
+    {
+      "scenario_id": "synthetic-abu-dhabi-8",
+      "scenario_hash": "e093f5c35020f33e7bd39696e39b2decdb78284fa1b731efebf4384b962a9c6a",
+      "policy_hash": "c02c5fc5d885ed17048173e6ed6b626671bec6debf33e680271e08030dc1853d",
+      "b0_fixed": {
+        "status": "UNSAFE_REFERENCE",
+        "elapsed_seconds": 0.00020922599992445612,
+        "validation": {
+          "valid": false,
+          "review_required": true,
+          "operational_approval_allowed": false,
+          "validator_version": "0.1.0",
+          "violations": [
+            {
+              "code": "MIDDAY_RESTRICTION",
+              "message": "Outdoor assignment overlaps a restricted local interval.",
+              "task_id": "task-01",
+              "worker_id": "worker-01"
+            },
+            {
+              "code": "WBGT_LIMIT",
+              "message": "Heat task exceeds the illustrative workload WBGT limit.",
+              "task_id": "task-01",
+              "worker_id": "worker-01"
+            },
+            {
+              "code": "WBGT_LIMIT",
+              "message": "Heat task exceeds the illustrative workload WBGT limit.",
+              "task_id": "task-02",
+              "worker_id": "worker-03"
+            },
+            {
+              "code": "WBGT_LIMIT",
+              "message": "Heat task exceeds the illustrative workload WBGT limit.",
+              "task_id": "task-03",
+              "worker_id": "worker-05"
+            },
+            {
+              "code": "MIDDAY_RESTRICTION",
+              "message": "Outdoor assignment overlaps a restricted local interval.",
+              "task_id": "task-04",
+              "worker_id": "worker-02"
+            },
+            {
+              "code": "UNINTERRUPTED_HEAT_LIMIT",
+              "message": "Heat task exceeds the worker's modeled uninterrupted allowance.",
+              "task_id": "task-04",
+              "worker_id": "worker-02"
+            },
+            {
+              "code": "WBGT_LIMIT",
+              "message": "Heat task exceeds the illustrative workload WBGT limit.",
+              "task_id": "task-04",
+              "worker_id": "worker-02"
+            },
+            {
+              "code": "WBGT_LIMIT",
+              "message": "Heat task exceeds the illustrative workload WBGT limit.",
+              "task_id": "task-05",
+              "worker_id": "worker-04"
+            },
+            {
+              "code": "WBGT_LIMIT",
+              "message": "Heat task exceeds the illustrative workload WBGT limit.",
+              "task_id": "task-06",
+              "worker_id": "worker-06"
+            },
+            {
+              "code": "MIDDAY_RESTRICTION",
+              "message": "Outdoor assignment overlaps a restricted local interval.",
+              "task_id": "task-07",
+              "worker_id": "worker-01"
+            },
+            {
+              "code": "WBGT_LIMIT",
+              "message": "Heat task exceeds the illustrative workload WBGT limit.",
+              "task_id": "task-07",
+              "worker_id": "worker-01"
+            },
+            {
+              "code": "MIDDAY_RESTRICTION",
+              "message": "Outdoor assignment overlaps a restricted local interval.",
+              "task_id": "task-08",
+              "worker_id": "worker-03"
+            },
+            {
+              "code": "WBGT_LIMIT",
+              "message": "Heat task exceeds the illustrative workload WBGT limit.",
+              "task_id": "task-08",
+              "worker_id": "worker-03"
+            },
+            {
+              "code": "MIDDAY_RESTRICTION",
+              "message": "Outdoor assignment overlaps a restricted local interval.",
+              "task_id": "task-09",
+              "worker_id": "worker-05"
+            },
+            {
+              "code": "WBGT_LIMIT",
+              "message": "Heat task exceeds the illustrative workload WBGT limit.",
+              "task_id": "task-09",
+              "worker_id": "worker-05"
+            },
+            {
+              "code": "MIDDAY_RESTRICTION",
+              "message": "Outdoor assignment overlaps a restricted local interval.",
+              "task_id": "task-10",
+              "worker_id": "worker-02"
+            },
+            {
+              "code": "WBGT_LIMIT",
+              "message": "Heat task exceeds the illustrative workload WBGT limit.",
+              "task_id": "task-10",
+              "worker_id": "worker-02"
+            },
+            {
+              "code": "COOLING_CAPACITY",
+              "message": "Concurrent protected recoveries exceed site cooling capacity.",
+              "task_id": null,
+              "worker_id": null
+            }
+          ],
+          "review_findings": [
+            {
+              "code": "DEMO_POLICY",
+              "message": "Policy thresholds and allowances are unreviewed software-test configuration.",
+              "task_id": null,
+              "worker_id": null
+            },
+            {
+              "code": "SYNTHETIC_SCENARIO",
+              "message": "Synthetic planning only; passing constraints does not approve actual work.",
+              "task_id": null,
+              "worker_id": null
+            },
+            {
+              "code": "SIMULATED_EVIDENCE",
+              "message": "Inputs contain simulated provenance within a synthetic replay.",
+              "task_id": null,
+              "worker_id": null
+            }
+          ],
+          "completed_tasks": 12,
+          "deferred_tasks": 0,
+          "exposure_proxy": 108300,
+          "workload_spread_minutes": 30
+        }
+      },
+      "b1_greedy": {
+        "status": "FEASIBLE",
+        "elapsed_seconds": 0.00602288300001419,
+        "validation": {
+          "valid": true,
+          "review_required": true,
+          "operational_approval_allowed": false,
+          "validator_version": "0.1.0",
+          "violations": [],
+          "review_findings": [
+            {
+              "code": "DEMO_POLICY",
+              "message": "Policy thresholds and allowances are unreviewed software-test configuration.",
+              "task_id": null,
+              "worker_id": null
+            },
+            {
+              "code": "SYNTHETIC_SCENARIO",
+              "message": "Synthetic planning only; passing constraints does not approve actual work.",
+              "task_id": null,
+              "worker_id": null
+            },
+            {
+              "code": "SIMULATED_EVIDENCE",
+              "message": "Inputs contain simulated provenance within a synthetic replay.",
+              "task_id": null,
+              "worker_id": null
+            }
+          ],
+          "completed_tasks": 12,
+          "deferred_tasks": 0,
+          "exposure_proxy": 91950,
+          "workload_spread_minutes": 105
+        }
+      },
+      "b2_cp_sat": {
+        "status": "FEASIBLE",
+        "elapsed_seconds": 2.0772570679998807,
+        "validation": {
+          "valid": true,
+          "review_required": true,
+          "operational_approval_allowed": false,
+          "validator_version": "0.1.0",
+          "violations": [],
+          "review_findings": [
+            {
+              "code": "DEMO_POLICY",
+              "message": "Policy thresholds and allowances are unreviewed software-test configuration.",
+              "task_id": null,
+              "worker_id": null
+            },
+            {
+              "code": "SYNTHETIC_SCENARIO",
+              "message": "Synthetic planning only; passing constraints does not approve actual work.",
+              "task_id": null,
+              "worker_id": null
+            },
+            {
+              "code": "SIMULATED_EVIDENCE",
+              "message": "Inputs contain simulated provenance within a synthetic replay.",
+              "task_id": null,
+              "worker_id": null
+            }
+          ],
+          "completed_tasks": 12,
+          "deferred_tasks": 0,
+          "exposure_proxy": 91050,
+          "workload_spread_minutes": 105
+        },
+        "solver_metadata": {
+          "scenario_hash": "e093f5c35020f33e7bd39696e39b2decdb78284fa1b731efebf4384b962a9c6a",
+          "policy_hash": "c02c5fc5d885ed17048173e6ed6b626671bec6debf33e680271e08030dc1853d",
+          "schema_version": "1",
+          "solver_version": "9.15.6755",
+          "seed": 8,
+          "elapsed_seconds": 2.076448,
+          "time_limit_seconds": 2.0,
+          "candidate_count": 683,
+          "stages": [
+            {
+              "name": "deferred_tasks",
+              "status": "OPTIMAL",
+              "value": 0,
+              "best_bound": 0.0
+            },
+            {
+              "name": "exposure_proxy",
+              "status": "FEASIBLE",
+              "value": 91050,
+              "best_bound": 89700.0
+            }
+          ]
+        },
+        "diagnostics": [
+          "Feasible incumbent; lexicographic optimality is not proven."
+        ]
+      }
+    },
+    {
+      "scenario_id": "synthetic-abu-dhabi-9",
+      "scenario_hash": "fbcd3a3042a46c32db32dcc09feb926db61a075c13f1841c1b406c7e15a54709",
+      "policy_hash": "c02c5fc5d885ed17048173e6ed6b626671bec6debf33e680271e08030dc1853d",
+      "b0_fixed": {
+        "status": "UNSAFE_REFERENCE",
+        "elapsed_seconds": 0.0002002030000767263,
+        "validation": {
+          "valid": false,
+          "review_required": true,
+          "operational_approval_allowed": false,
+          "validator_version": "0.1.0",
+          "violations": [
+            {
+              "code": "MIDDAY_RESTRICTION",
+              "message": "Outdoor assignment overlaps a restricted local interval.",
+              "task_id": "task-01",
+              "worker_id": "worker-01"
+            },
+            {
+              "code": "WBGT_LIMIT",
+              "message": "Heat task exceeds the illustrative workload WBGT limit.",
+              "task_id": "task-01",
+              "worker_id": "worker-01"
+            },
+            {
+              "code": "WBGT_LIMIT",
+              "message": "Heat task exceeds the illustrative workload WBGT limit.",
+              "task_id": "task-02",
+              "worker_id": "worker-03"
+            },
+            {
+              "code": "WBGT_LIMIT",
+              "message": "Heat task exceeds the illustrative workload WBGT limit.",
+              "task_id": "task-03",
+              "worker_id": "worker-05"
+            },
+            {
+              "code": "MIDDAY_RESTRICTION",
+              "message": "Outdoor assignment overlaps a restricted local interval.",
+              "task_id": "task-04",
+              "worker_id": "worker-02"
+            },
+            {
+              "code": "UNINTERRUPTED_HEAT_LIMIT",
+              "message": "Heat task exceeds the worker's modeled uninterrupted allowance.",
+              "task_id": "task-04",
+              "worker_id": "worker-02"
+            },
+            {
+              "code": "WBGT_LIMIT",
+              "message": "Heat task exceeds the illustrative workload WBGT limit.",
+              "task_id": "task-04",
+              "worker_id": "worker-02"
+            },
+            {
+              "code": "WBGT_LIMIT",
+              "message": "Heat task exceeds the illustrative workload WBGT limit.",
+              "task_id": "task-05",
+              "worker_id": "worker-04"
+            },
+            {
+              "code": "WBGT_LIMIT",
+              "message": "Heat task exceeds the illustrative workload WBGT limit.",
+              "task_id": "task-06",
+              "worker_id": "worker-06"
+            },
+            {
+              "code": "MIDDAY_RESTRICTION",
+              "message": "Outdoor assignment overlaps a restricted local interval.",
+              "task_id": "task-07",
+              "worker_id": "worker-01"
+            },
+            {
+              "code": "WBGT_LIMIT",
+              "message": "Heat task exceeds the illustrative workload WBGT limit.",
+              "task_id": "task-07",
+              "worker_id": "worker-01"
+            },
+            {
+              "code": "MIDDAY_RESTRICTION",
+              "message": "Outdoor assignment overlaps a restricted local interval.",
+              "task_id": "task-08",
+              "worker_id": "worker-03"
+            },
+            {
+              "code": "WBGT_LIMIT",
+              "message": "Heat task exceeds the illustrative workload WBGT limit.",
+              "task_id": "task-08",
+              "worker_id": "worker-03"
+            },
+            {
+              "code": "MIDDAY_RESTRICTION",
+              "message": "Outdoor assignment overlaps a restricted local interval.",
+              "task_id": "task-09",
+              "worker_id": "worker-05"
+            },
+            {
+              "code": "WBGT_LIMIT",
+              "message": "Heat task exceeds the illustrative workload WBGT limit.",
+              "task_id": "task-09",
+              "worker_id": "worker-05"
+            },
+            {
+              "code": "MIDDAY_RESTRICTION",
+              "message": "Outdoor assignment overlaps a restricted local interval.",
+              "task_id": "task-10",
+              "worker_id": "worker-02"
+            },
+            {
+              "code": "WBGT_LIMIT",
+              "message": "Heat task exceeds the illustrative workload WBGT limit.",
+              "task_id": "task-10",
+              "worker_id": "worker-02"
+            },
+            {
+              "code": "COOLING_CAPACITY",
+              "message": "Concurrent protected recoveries exceed site cooling capacity.",
+              "task_id": null,
+              "worker_id": null
+            }
+          ],
+          "review_findings": [
+            {
+              "code": "DEMO_POLICY",
+              "message": "Policy thresholds and allowances are unreviewed software-test configuration.",
+              "task_id": null,
+              "worker_id": null
+            },
+            {
+              "code": "SYNTHETIC_SCENARIO",
+              "message": "Synthetic planning only; passing constraints does not approve actual work.",
+              "task_id": null,
+              "worker_id": null
+            },
+            {
+              "code": "SIMULATED_EVIDENCE",
+              "message": "Inputs contain simulated provenance within a synthetic replay.",
+              "task_id": null,
+              "worker_id": null
+            }
+          ],
+          "completed_tasks": 12,
+          "deferred_tasks": 0,
+          "exposure_proxy": 110025,
+          "workload_spread_minutes": 30
+        }
+      },
+      "b1_greedy": {
+        "status": "FEASIBLE",
+        "elapsed_seconds": 0.00655988299990895,
+        "validation": {
+          "valid": true,
+          "review_required": true,
+          "operational_approval_allowed": false,
+          "validator_version": "0.1.0",
+          "violations": [],
+          "review_findings": [
+            {
+              "code": "DEMO_POLICY",
+              "message": "Policy thresholds and allowances are unreviewed software-test configuration.",
+              "task_id": null,
+              "worker_id": null
+            },
+            {
+              "code": "SYNTHETIC_SCENARIO",
+              "message": "Synthetic planning only; passing constraints does not approve actual work.",
+              "task_id": null,
+              "worker_id": null
+            },
+            {
+              "code": "SIMULATED_EVIDENCE",
+              "message": "Inputs contain simulated provenance within a synthetic replay.",
+              "task_id": null,
+              "worker_id": null
+            }
+          ],
+          "completed_tasks": 12,
+          "deferred_tasks": 0,
+          "exposure_proxy": 92625,
+          "workload_spread_minutes": 105
+        }
+      },
+      "b2_cp_sat": {
+        "status": "OPTIMAL",
+        "elapsed_seconds": 0.35463534400014396,
+        "validation": {
+          "valid": true,
+          "review_required": true,
+          "operational_approval_allowed": false,
+          "validator_version": "0.1.0",
+          "violations": [],
+          "review_findings": [
+            {
+              "code": "DEMO_POLICY",
+              "message": "Policy thresholds and allowances are unreviewed software-test configuration.",
+              "task_id": null,
+              "worker_id": null
+            },
+            {
+              "code": "SYNTHETIC_SCENARIO",
+              "message": "Synthetic planning only; passing constraints does not approve actual work.",
+              "task_id": null,
+              "worker_id": null
+            },
+            {
+              "code": "SIMULATED_EVIDENCE",
+              "message": "Inputs contain simulated provenance within a synthetic replay.",
+              "task_id": null,
+              "worker_id": null
+            }
+          ],
+          "completed_tasks": 12,
+          "deferred_tasks": 0,
+          "exposure_proxy": 92175,
+          "workload_spread_minutes": 105
+        },
+        "solver_metadata": {
+          "scenario_hash": "fbcd3a3042a46c32db32dcc09feb926db61a075c13f1841c1b406c7e15a54709",
+          "policy_hash": "c02c5fc5d885ed17048173e6ed6b626671bec6debf33e680271e08030dc1853d",
+          "schema_version": "1",
+          "solver_version": "9.15.6755",
+          "seed": 9,
+          "elapsed_seconds": 0.353719,
+          "time_limit_seconds": 2.0,
+          "candidate_count": 615,
+          "stages": [
+            {
+              "name": "deferred_tasks",
+              "status": "OPTIMAL",
+              "value": 0,
+              "best_bound": 0.0
+            },
+            {
+              "name": "exposure_proxy",
+              "status": "OPTIMAL",
+              "value": 92175,
+              "best_bound": 92175.0
+            },
+            {
+              "name": "workload_spread_minutes",
+              "status": "OPTIMAL",
+              "value": 105,
+              "best_bound": 105.0
+            }
+          ]
+        },
+        "diagnostics": []
+      }
+    }
+  ]
+}
