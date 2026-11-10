@@ -1,0 +1,59 @@
+{
+  "verified_on": "2026-11-10",
+  "image": "heatshield-os:local",
+  "image_id": "sha256:c1c7f5e033a509ad3adbff7711aef37a8b6cbd7003478a9c5433603590b8c0a4",
+  "compose_project": "heatshield-packaging-check",
+  "loopback_port": 18000,
+  "database_image": "postgres:17-alpine",
+  "image_build": "passed",
+  "dependency_tls_verification": true,
+  "runtime_uid": 10001,
+  "api_read_only_root_filesystem": true,
+  "checks": {
+    "postgresql_api_worker_healthy": "passed",
+    "migrate_and_demo_seed": "passed",
+    "compiled_react_static_assets": "passed",
+    "authenticated_scenario_creation": "passed",
+    "separate_worker_queued_to_completed": "passed",
+    "solver_status": "OPTIMAL",
+    "independent_validation": "passed",
+    "revision_bound_review_and_publication": "passed",
+    "instruction_languages": [
+      "en",
+      "hi",
+      "ar"
+    ],
+    "acknowledgement_then_separate_verification": "passed",
+    "severe_report_stop_work_and_no_dispatch": "passed",
+    "full_stack_restart_preserves_published_scenario_hold_and_8_audit_events": "passed",
+    "queued_job_survives_database_and_api_restart_while_worker_stopped": "passed",
+    "worker_restart_completes_retained_job_with_one_attempt": "passed"
+  },
+  "final_state": "Only the isolated rehearsal stack was stopped; its database volume and tagged image were preserved.",
+  "template_checks": {
+    "pytest_passed": 16,
+    "ruff": "passed",
+    "shell_syntax": "passed",
+    "git_diff_check": "passed"
+  },
+  "limitations": [
+    "All scenarios, accounts, policy thresholds and symptoms are synthetic.",
+    "No real-work authorization, clinical validation or emergency dispatch is claimed.",
+    "A green worker healthcheck establishes a running process with database connectivity, not a continuous job-throughput guarantee."
+  ],
+  "full_workflow_image_id": "sha256:cb49b4a30d890a969152cf4cb341ae501ad06d450b7e1db16b655f08a56e1e49",
+  "delta_route_image_update": {
+    "verified_on": "2026-11-10",
+    "image_id": "sha256:c1c7f5e033a509ad3adbff7711aef37a8b6cbd7003478a9c5433603590b8c0a4",
+    "final_frontend_with_withdraw_action_served": "passed",
+    "withdraw_openapi_route": "passed",
+    "two_plans_solved_and_reviewed": "passed",
+    "first_publication": "PUBLISHED",
+    "overlapping_second_publication": 409,
+    "first_withdrawal": "WITHDRAWN",
+    "replacement_second_publication": "PUBLISHED",
+    "postgresql_api_worker_healthy": "passed",
+    "previous_task_image_removed_after_successful_export": true,
+    "final_stack_state": "Stopped only heatshield-packaging-check; tagged final image and database volume preserved."
+  }
+}

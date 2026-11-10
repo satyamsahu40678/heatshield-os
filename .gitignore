@@ -8,3 +8,14 @@ dist/
 .env
 .coverage
 benchmark-results*.json
+node_modules/
+web/dist/
+web/test-results/
+web/playwright-report/
+data/
+*.db
+*.db-shm
+*.db-wal
+.env.*
+!.env.example
+*.dump

@@ -1,104 +1,132 @@
 # HeatShield OS
 
-A synthetic planning prototype for explainable occupational heat prevention.
-The first implementation proposes task schedules and checks them independently
-against an **illustrative, unreviewed demo policy**. It does not approve real work.
+Turn heat evidence into a workable plan, then track protective action through
+worker acknowledgement and supervisor verification.
 
-Read the [refined technical design](docs/design.md) and the
-[prioritized implementation plan](docs/implementation-plan.md).
-The [verification record](docs/verification.md) contains test results and the
-computed synthetic benchmark.
+HeatShield OS is a complete **synthetic demonstration application** with a React
+workspace, authenticated FastAPI service, PostgreSQL persistence and a separate
+durable optimization worker. Scheduling uses OR-Tools CP-SAT and an independently
+implemented validator. Policies and worker records are illustrative; demo review
+and publication cannot authorize real work.
 
-## Run locally
+## Start the complete app
 
-Requires Python 3.12+ and [uv](https://docs.astral.sh/uv/).
+Requires Docker with Compose.
+
+```sh
+cp .env.example .env
+docker compose up --build
+```
+
+Open <http://localhost:8000>. Compose starts PostgreSQL, applies migrations,
+creates demo identities, and starts the API and worker. Data survives normal
+container restarts in a named PostgreSQL volume.
+
+Use `safety@example.test`, `supervisor@example.test`, or `worker@example.test`
+with the public demo password **`HeatShieldDemo2026!`**. These fixture identities
+exist only in demo setup. Start with the safety officer: create a scenario,
+load the fixture, generate a plan, record demo review and publish it. Switch to
+the worker to acknowledge recovery, then the supervisor to verify it.
+
+For managed environments with an HTTPS inspection proxy, use
+`scripts/build-image.sh` to pass optional CA build secrets, followed by
+`docker compose up`. See [deployment instructions](docs/deployment.md) for
+configuration, backups, migrations, non-demo provisioning and cleanup.
+
+## What works
+
+- Versioned scenario creation/import/editing, immutable input/policy snapshots,
+  provenance, exact site-local restriction checks and explicit task deferrals.
+- Skills, availability, acclimatization allowances, per-horizon heat-work caps,
+  full-interval WBGT evidence, protected recovery and cooling capacity.
+- Lexicographic CP-SAT planning, independent validation, fixed/greedy comparisons,
+  solver status, objective bounds, reproducibility hashes and audit findings.
+- Durable queued runs with leases, crash recovery and fencing against late
+  workers. Database state survives API/worker restarts.
+- Tenant-scoped identities, administrator/safety/supervisor/worker roles,
+  expiring bearer sessions, logout revocation and idempotent workflow commands.
+- Fresh revision/hash-bound demo review and publication. Changed or tampered
+  plans cannot reuse an earlier review. Publication also rejects conflicting
+  worker assignments across active plans; audited withdrawal permits replacement.
+- Responsive supervisor dashboard and worker PWA. Worker views contain only
+  their own published assignments; acknowledgement and verification are distinct.
+- English/Hindi/Arabic recovery instructions, minimized private symptom reports,
+  generic staff stop-work alerts and an explicitly demonstrative hold-release
+  workflow. The application does not dispatch emergency services.
+- Optional Open-Meteo forecast context, clearly separated from admissible WBGT
+  measurements. Forecast context never admits a heat-work assignment.
+
+## Local development
+
+Requires Python 3.12+, Node 22+ and [uv](https://docs.astral.sh/uv/).
 
 ```sh
 uv sync --extra dev --frozen
-uv run heatshield demo
-uv run uvicorn heatshield.api:app --host 127.0.0.1 --port 8000
+cd web
+npm ci
+npm run build
+cd ..
+uv run heatshield migrate
+uv run heatshield seed-demo
+uv run heatshield serve
 ```
 
-Open <http://127.0.0.1:8000/docs> for the interactive API. No external services,
-API keys, database or weather connection are required for this milestone.
+In a second terminal from the repository:
 
 ```sh
-curl http://127.0.0.1:8000/api/v1/demo/scenario -o /tmp/scenario.json
-curl -X POST http://127.0.0.1:8000/api/v1/scenarios/optimize \
-  -H 'Content-Type: application/json' --data-binary @/tmp/scenario.json
+uv run heatshield worker
 ```
 
-The scenario is fabricated: six workers, twelve tasks, an Abu Dhabi summer shift
-and simulated hourly WBGT observations. `heatshield fixture --seed 8` prints a
-different reproducible input. `heatshield schema` exports the OpenAPI contract.
+The default development database is SQLite in `data/`. Set
+`HEATSHIELD_DATABASE_URL` for PostgreSQL. `cd web && npm run dev` starts Vite with
+an API proxy to port 8000. The built client is served directly by FastAPI.
+Interactive API documentation is at `/docs`.
 
-## Implemented foundation
-
-- Strict versioned inputs, bounded scenario sizes, UTC timestamps and site-local
-  half-open restriction intervals.
-- Single-worker atomic tasks, skills and availability, explicit deferral,
-  acclimatization allowances, per-horizon heat-work caps and full-interval WBGT
-  evidence. All allowances and thresholds are demo configuration.
-- Explicit recovery after each heat task, worker non-overlap and shared cooling
-  capacity. Idle time is not silently counted as recovery.
-- OR-Tools CP-SAT with lexicographic objectives: deferrals, environmental proxy,
-  then workload spread. Solver statuses, stages, seed and version are retained.
-- An independent validator that reconstructs constraints from the original
-  inputs, checks hashes, and rejects tampered or incomplete schedules.
-- Stateless FastAPI endpoints, a fixed reference roster, a greedy baseline and
-  computed benchmark output.
-
-Every result requires human review. `validation.valid` means the submitted plan
-passes the encoded demo constraints; `operational_approval_allowed` is always
-`false`. `UNKNOWN` means feasibility was not established, whereas `INFEASIBLE`
-is a solver proof under the supplied model and evidence. An impossible mandatory
-task is never silently deferred. The intentionally unsafe fixed roster is a
-benchmark reference, never a fallback.
-
-## API
-
-| Method | Path | Body/result |
-| --- | --- | --- |
-| GET | `/healthz` | Process health and synthetic mode |
-| GET | `/api/v1/demo/scenario` | Reproducible scenario |
-| POST | `/api/v1/scenarios/optimize` | Scenario → solver result and validation |
-| POST | `/api/v1/scenarios/validate` | `{ "scenario": ..., "schedule": ... }` → findings |
-
-The synchronous CP solve-stage budget is at most five seconds. Model construction
-and independent validation take additional time. Candidate generation is capped
-at 50,000 admitted worker/task/start combinations. This local API has no users,
-tenant isolation, storage, operational approval or publishing.
-
-## Verify and compare
+## Verify
 
 ```sh
 uv run --extra dev pytest
 uv run --extra dev ruff check .
 uv run --extra dev ruff format --check .
-uv run heatshield benchmark --count 3 --seed 7 --output benchmark-results.json
+cd web && npm run build
 ```
 
-The benchmark checks fixed, greedy and optimized schedules against identical
-inputs and the same independent validator. It reports actual completion,
-deferrals, violations, proxy scores and runtimes; there is no hardcoded
-performance-improvement claim. The small smoke benchmark varies fabricated heat
-and cooling capacity. It is not a clinical evaluation or a representative
-workforce study. P95 is emitted only for at least twenty samples.
+Set `HEATSHIELD_TEST_DATABASE_URL` to an isolated PostgreSQL database to include
+real migration, concurrent-claim, lease-recovery and publication-race tests.
+Those tests use disposable schemas and skip when the variable is absent.
 
-GitHub Actions runs these checks and retains a generated benchmark artifact.
+With the API and worker running, execute browser tests against the built client:
 
-## Boundaries and next milestone
+```sh
+cd web
+npx playwright install chromium
+PLAYWRIGHT_BASE_URL=http://127.0.0.1:8000 npm run test:e2e
+```
 
-The exposure score is an ordering proxy, not physiological dose. Workload spread
-is a demonstration objective, not validated fairness or proof of preserved pay.
-Forecast, simulated, manual and sensor labels remain distinct; forecast-only,
-stale, suspect and uncalibrated sensor evidence cannot admit heat assignments.
-Calendar rules alone do not establish heat safety.
+The test configuration also accepts `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` for an
+existing Chromium installation. GitHub Actions runs backend/PostgreSQL tests,
+frontend build/browser checks and a container build.
 
-Next: PostgreSQL snapshots and migrations, durable optimization jobs, tenant
-permissions, revision-bound approvals, then the supervisor dashboard and worker
-acknowledgement/verification workflow. Crews, buddy requirements, payroll,
-rolling work/rest rules, live sensors, medical histories and emergency dispatch
-are outside this first implementation. See the plan for their acceptance gates.
+```sh
+uv run heatshield benchmark --suite robustness --count 100 --seed 7 --output benchmark-results.json
+```
 
+The robustness suite cycles ten declared synthetic families, including missing
+cooling, skill shortages, missing/forecast-only evidence, tight deadlines and
+conflicting readings. The retained [benchmark summary](docs/evidence/benchmark-summary.json)
+and [verification record](docs/verification.md) contain computed results. These
+are software-policy checks and exposure-ordering proxies, not health outcomes.
+
+## Technical documentation
+
+- [Architecture and domain semantics](docs/design.md)
+- [Implementation plan and release gates](docs/implementation-plan.md)
+- [Product scope and future field-pilot boundaries](docs/product-scope.md)
+- [Security model and configuration](docs/security-notes.md)
+- [Deployment and operations](docs/deployment.md)
+- [Three-minute demo script](docs/demo-script.md)
+- [Verification evidence](docs/verification.md)
+
+Crews, payroll guarantees, reviewed rolling work/rest rules, certified sensors
+and clinical field validation remain explicit research/integration extensions.
 HeatShield OS remains a working title pending public-brand review.

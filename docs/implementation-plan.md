@@ -1,7 +1,8 @@
 # HeatShield OS: prioritized implementation plan
 
-Prepared 2026-11-09. See [the refined design](design.md) for contracts, safety
-boundaries and architecture decisions.
+Prepared 2026-11-09; implementation status updated 2026-11-10. See
+[the refined design](design.md) for the current architecture and
+[verification](verification.md) for executed checks.
 
 The shared discussion names **November 20, 2026** as the prototype submission
 deadline. That date has not been independently verified here. The plan below
@@ -26,17 +27,29 @@ flowchart LR
     I --> J
 ```
 
-P0 is the implemented and tested mathematical/API foundation.
-Verification: 95 tests passed; see [the verification record](verification.md). P1 adds product
-workflow and persistence. P2 broadens the constraint model and adds optional
-presentation capabilities. A missing P1/P2 feature must remain visible in scope
-documentation; it cannot become an implied P0 guarantee.
+P0 and the P1 synthetic product workflow are implemented. The latest complete
+Python run passed **200 tests**, including **11 real PostgreSQL tests**; Ruff
+passed across 44 Python files. The final production UI build and four Chromium workflow tests passed, including
+audited withdrawal and a private-report/stop-work response. The full Compose
+journey and persistence rehearsal passed; the final-source conflict/withdrawal container delta passed too. The source
+and remote CI status are recorded in the release gates below.
+
+The 100-scenario robustness run also completed: ten families with ten scenarios
+each, 55 validated proposals (22 `OPTIMAL`, 33 `FEASIBLE`), 45 `INFEASIBLE`
+outcomes and zero invalid returned proposals. Median runtime was 0.346 seconds
+and p95 2.032 seconds in that recorded run. These are software-demo results,
+not clinical or population-effect evidence. The retained
+[summary](evidence/benchmark-summary.json) and
+[compressed full output](evidence/benchmark-robustness-100.json.gz) support them.
+
+MVP completion means the usable synthetic workflow plus packaging and evidence.
+Broader crew, payroll, rolling-policy and field-pilot extensions remain explicit
+roadmap work, not implied features of a completed synthetic MVP.
 
 ## 2. P0: first executable planning slice
 
-Target effort: approximately 2–3 focused engineering days. These checkboxes
-describe work to complete and should be marked only after code and verification
-exist.
+Original planning estimate: approximately 2–3 focused engineering days. This
+milestone is implemented and covered by domain, solver, validator and API tests.
 
 ### A. Contracts, fixtures and review baseline — 0.5 day
 
@@ -107,75 +120,130 @@ the separate validation route can check; benchmark numbers come from execution.
 
 ## 3. P1: persistent product workflow
 
-Target effort: approximately 3–4 focused engineering days, after P0 contracts
-stabilize. This work can partly parallelize with the supervisor dashboard.
+Original planning estimate: approximately 3–4 focused engineering days. All
+features below have code and targeted verification. Final browser/deployment
+release gates remain separate; a checked implementation task does not imply
+clinical approval or completion of every broader blueprint extension.
 
 ### E. Persistence and durable jobs — 1 day
 
-- [ ] Add PostgreSQL, SQLAlchemy models and Alembic migrations.
-- [ ] Persist immutable scenario/policy snapshots and schedule revisions.
-- [ ] Persist optimization run state, metadata, findings and audit events.
-- [ ] Add a separate durable worker and queue, retry policy and idempotency keys.
-- [ ] Introduce scenario creation and run-resource endpoints, documenting changes
+- [x] Add PostgreSQL, SQLAlchemy models and an explicit Alembic migration for
+  thirteen application tables; retain SQLite development support.
+- [x] Persist complete immutable scenario/policy revisions and exact result hashes.
+- [x] Persist optimization run state, metadata, findings, comparisons and audit events.
+- [x] Add a separate database-backed worker with leased claims, attempt fencing,
+  crash recovery and idempotency keys. Redis/Celery are not required.
+- [x] Introduce scenario creation and run-resource endpoints, documenting changes
   from the initial stateless API.
 
 Acceptance: accepted work survives process restarts; retries do not duplicate
-commands; a run can be reproduced from its retained snapshot.
+commands; a run can be reproduced from its retained snapshot. Real PostgreSQL
+tests cover migration round trips, `SKIP LOCKED`, duplicate claims, lease
+reclamation, restart durability and conflicting publication transitions.
 
 ### F. Identity, approval and publishing — 0.75–1 day
 
-- [ ] Add authenticated roles and tenant-scoped database access.
-- [ ] Restrict policy changes, approvals and worker/private data by role.
-- [ ] Bind approval to input/policy hashes and schedule revision.
-- [ ] Revalidate atomically at approval and publishing; invalidate on changes.
-- [ ] Add audit records, request/concurrency limits and command idempotency.
+- [x] Add authenticated roles, JWT expiry/revocation and tenant-scoped access.
+- [x] Restrict synthetic policy/scenario revision, review and worker data by role;
+  derive tenant, actor and worker identity from the authenticated account.
+- [x] Bind synthetic review to input/policy/schedule hashes and revision.
+- [x] Revalidate atomically at review/publication, invalidate on revision changes,
+  and reject or hide tampered and superseded candidates.
+- [x] Add audit records, request/concurrency limits and actor-bound idempotency.
+- [x] Block conflicting workers across active published plans under a tenant lock;
+  provide audited withdrawal and replacement without deleting history.
 
 Acceptance: cross-tenant access fails; stale approval cannot publish a changed
-plan; no real-user deployment proceeds without these controls.
+plan; worker and private-report boundaries are enforced by the server. The
+independent product security suite passed 23 tests. The authentication suite
+passed 17 tests. See [security notes](security-notes.md) for controls and limits.
 
 ### G. Supervisor dashboard — 1–1.5 days
 
-- [ ] Build a React/TypeScript scenario and schedule view from actual API data.
-- [ ] Show original findings, proposal, explicit deferrals and recovery resources.
-- [ ] Show provenance/uncertainty, exact policy references and computed metrics.
-- [ ] Support planning-run status and human-review workflow after F is complete.
-- [ ] Add browser coverage of the core planning journey.
+- [x] Build a React/TypeScript scenario and schedule view from actual API data.
+- [x] Show original findings, proposal, explicit deferrals and recovery resources.
+- [x] Show provenance/uncertainty, exact policy references and computed metrics.
+- [x] Support durable run polling and role-bound synthetic review/publication.
+- [x] Add Chromium browser coverage of the planning/intervention journey.
+- [x] Build the production UI bundle with TypeScript and Vite checks.
 
 Acceptance: users can trace a changed assignment to its rule/data evidence, and
-the UI preserves solver uncertainty and synthetic labels.
+the UI preserves solver uncertainty and synthetic labels. Four final production-bundle browser tests passed. The journey includes
+withdrawal and confirmation that withdrawn plans disappear from worker views.
 
 ### H. Intervention loop — 0.75–1 day
 
-- [ ] Add worker schedule/instruction view and approved message templates.
-- [ ] Record acknowledgement separately from supervisor verification.
-- [ ] Add append-only intervention transitions and escalation ownership.
-- [ ] Add an explicit severe-symptom human-response workflow; do not claim to
+- [x] Add worker-only published schedules and fixed English/Hindi/Arabic
+  demonstration templates, without a clinical translation-review claim.
+- [x] Record worker acknowledgement separately from staff verification.
+- [x] Add append-only intervention transitions and minimal staff escalation ownership.
+- [x] Add private synthetic reports, active holds, worker-view suppression and a
+  safety-role demo-release action that explicitly is not medical clearance.
+- [x] Add an explicit severe-symptom human-response workflow; do not claim to
   dispatch emergency services.
 
 Acceptance: a sent or acknowledged instruction is never presented as a verified
-completed protective action. Health information has an authorized, minimized
-storage/access path before real-worker use.
+completed protective action. Raw symptom/severity details remain outside general
+audit/outbox payloads. Workflow and worker suites passed 31 tests; PostgreSQL
+tests also serialize symptom/publication races. Real health-data use remains
+outside this release.
 
-## 4. P2: broader constraints and competition evidence
+## 4. P2: evidence and delivery implemented for the MVP
 
-Target effort: 1–2 days for selected items. Choose based on remaining time and
-policy review; do not rush all items into the first model.
+The delivery/evidence subset is implemented; the broader modeling extensions
+below remain outside the synthetic MVP completion target.
+
+- [x] Execute 100 seeded scenarios across ten adversarial families; retain paired
+  computed metrics, feasible coverage, violations, solver states and runtime
+  distributions with transparent synthetic-sampling limitations.
+- [x] Add optional attributed weather screening context, explicitly excluded
+  from WBGT evidence and work-admission decisions.
+- [x] Add fixed multilingual application templates; use no LLM in policy or
+  scheduling decisions.
+- [x] Package a multi-stage Docker image, API/worker/PostgreSQL Compose stack,
+  health/readiness checks, migrations and reproducible synthetic fixtures.
+- [x] Write [deployment instructions](deployment.md),
+  [product scope](product-scope.md) and a [three-minute demo script](demo-script.md).
+
+Acceptance: reported results come from retained runs, clear baselines and
+declared scenario families. A successful image build does not replace the
+full-stack deployment and restart rehearsal below.
+
+### Broader constraints and field-pilot extensions — intentionally not implemented
 
 - [ ] Model crews/buddy coverage, task precedence and travel where required.
 - [ ] Add reviewed rolling work/rest policies and richer workload/clothing rules.
 - [ ] Model paid attendance/recovery before claiming wage protection.
 - [ ] Add historical fairness across comparable eligible workers.
-- [ ] Expand to 100–300 seeded synthetic scenarios and report paired outcomes,
-  feasible coverage, violations, runtime distribution and solver optimality.
-- [ ] Add optional weather ingestion with explicit screening-only provenance.
-- [ ] Add multilingual approved templates; keep optional LLM explanations out of
-  policy and scheduling decisions.
-- [ ] Prepare deployment, a reproducible demo seed and a three-minute demo script.
+- [ ] Integrate certified live measurements and real employer systems through a
+  reviewed data-quality and operational policy process.
+- [ ] Conduct appropriate clinical/field evaluation before making health-outcome
+  or real-work safety claims.
 
-Acceptance: reported performance comes from retained runs and clear baselines;
-all broadened constraints have adversarial verification and documented limits.
+These items require new domain contracts and evidence. Keep them open rather
+than marking the entire original blueprint implemented. Optional wearables,
+biometrics, custom medical classifiers, RAG/LLM and external messaging are also
+outside the present release.
 
-## 5. Working calendar to the discussion's November 20 target
+## 5. Remaining release gates and working calendar
+
+- [x] Complete the Python suite with a real PostgreSQL integration target:
+  200 passed, including eleven PostgreSQL checks.
+- [x] Complete Ruff lint/format checks: 44 Python files passed.
+- [x] Build the TypeScript/Vite production client and pass four final
+  Chromium product journeys.
+- [x] Complete and retain the 100-scenario robustness benchmark.
+- [x] Build the Docker application image successfully.
+- [x] Finish final production-bundle browser checks after the last display changes: four passed.
+- [x] Complete API/worker/PostgreSQL Compose journey and persistent restart rehearsal.
+- [x] Recheck the final-source container conflict/withdrawal delta.
+- [x] Reconcile the final verification record and publish source/evidence to PR #1.
+- [ ] Confirm remote CI on the final source revision; publication alone is not a passing CI result.
+
+The calendar below preserves the original dependency plan. Much of its
+implementation landed by November 10; these rows are working targets, not a
+claim that work was executed on each future date. The discussion's November 20
+submission date still requires independent organizer confirmation.
 
 | Working dates | Deliverable | Exit gate |
 | --- | --- | --- |
@@ -187,19 +255,20 @@ all broadened constraints have adversarial verification and documented limits.
 | Nov 19 | Deployment rehearsal, docs and demo recording | Fresh setup and full synthetic demo reproducible |
 | Nov 20 | Submission packaging, if confirmed | Verified submission requirements and retained artifacts |
 
-This is dependency-aware scope planning, not a claim that the entire blueprint
-can be completed safely by parallelizing every row. Reserve time for integration
-and cut optional features when a prior gate is not met.
+Use remaining time for the release gates, reproducibility and submission review.
+Do not expand the domain model simply to check every original research item
+without the policy and test work it requires.
 
 ## 6. Scope cut line and release decision
 
-If time is short, retain P0 correctness, the independent validator, benchmark
-evidence and a minimal supervisor demonstration. Cut optional AI/RAG, wearables,
-live sensors, custom medical classifiers and rich visual polish first. Never
+The current completion target retains P0 correctness, the independent validator,
+the full synthetic P1 workflow, benchmark evidence and delivery packaging.
+Optional AI/RAG, wearables, live sensors, custom medical classifiers and richer
+constraint models remain extensions. Never
 cut task accounting, uncertainty labels, exact restriction checks or the
 distinction between a feasible proposal and an approved real-world plan.
 
-A competition demo may remain synthetic and local. Real workplace operation
+A complete competition demo can remain synthetic and local. Real workplace operation
 requires qualified policy review, applicable legal verification, certified or
 otherwise appropriate measurement integrations, secure real-user workflow and
 field evaluation beyond this prototype plan.

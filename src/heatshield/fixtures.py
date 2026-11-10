@@ -69,6 +69,9 @@ def fixed_roster(scenario: Scenario) -> Schedule:
     next_start = {worker.id: scenario.starts_at + timedelta(hours=6) for worker in scenario.workers}
     for task in scenario.tasks:
         qualified = [w for w in scenario.workers if task.required_skill in w.skills]
+        # The unchecked reference remains representable under skill-shortage stress cases.
+        # Its independent report records SKILL rather than crashing the benchmark.
+        qualified = qualified or list(scenario.workers)
         worker = min(qualified, key=lambda w: (next_start[w.id], w.id))
         start = next_start[worker.id]
         end = start + timedelta(minutes=task.duration_minutes)

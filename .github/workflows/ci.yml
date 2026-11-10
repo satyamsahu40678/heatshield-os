@@ -1,12 +1,26 @@
-name: Planning core
+name: Verify HeatShield OS
 on:
   push:
   pull_request:
 permissions:
   contents: read
 jobs:
-  verify:
+  backend:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: heatshield
+          POSTGRES_PASSWORD: ci-synthetic-only
+          POSTGRES_DB: heatshield
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U heatshield -d heatshield"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+    env:
+      HEATSHIELD_TEST_DATABASE_URL: postgresql+psycopg://heatshield:ci-synthetic-only@127.0.0.1:5432/heatshield
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
@@ -19,8 +33,63 @@ jobs:
       - run: uv run --extra dev ruff check .
       - run: uv run --extra dev ruff format --check .
       - run: uv run --extra dev pytest
-      - run: uv run heatshield benchmark --count 3 --output benchmark-results.json
+      - run: uv run heatshield benchmark --suite robustness --count 10 --output benchmark-results.json
       - uses: actions/upload-artifact@v4
         with:
           name: synthetic-benchmark
           path: benchmark-results.json
+  browser:
+    runs-on: ubuntu-latest
+    env:
+      HEATSHIELD_DATABASE_URL: sqlite:///./data/ci-browser.db
+      HEATSHIELD_DEMO: 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: uv sync --locked
+      - run: npm ci
+        working-directory: web
+      - run: npm run build
+        working-directory: web
+      - run: npx playwright install --with-deps chromium
+        working-directory: web
+      - name: Start persisted application and durable worker
+        run: |
+          uv run heatshield migrate
+          uv run heatshield seed-demo
+          uv run heatshield serve --host 127.0.0.1 --port 8000 > /tmp/heatshield-api.log 2>&1 &
+          uv run heatshield worker --poll-seconds 0.2 > /tmp/heatshield-worker.log 2>&1 &
+          for attempt in {1..40}; do
+            if curl --fail --silent http://127.0.0.1:8000/readyz; then break; fi
+            sleep 1
+          done
+          curl --fail http://127.0.0.1:8000/readyz
+      - run: npm run test:e2e
+        working-directory: web
+        env:
+          PLAYWRIGHT_BASE_URL: http://127.0.0.1:8000
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: browser-evidence
+          path: |
+            web/test-results
+            web/playwright-report
+            /tmp/heatshield-api.log
+            /tmp/heatshield-worker.log
+  container:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker compose config --quiet
+      - run: docker build --tag heatshield-os:ci .
