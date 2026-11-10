@@ -1,9 +1,10 @@
 # Three-minute synthetic demonstration
 
-This script uses persisted application workflows and the seeded six-worker,
-twelve-task Abu Dhabi scenario. All workers, observations and policy thresholds
-are fabricated. The fixture's date is July 15, 2026, so its local summer
-restriction is exercised even when the demonstration is run in November.
+This script starts from the populated operations workspace, then creates a
+fresh six-worker, twelve-task Abu Dhabi planning scenario. All workers,
+observations, reviews and policy thresholds are synthetic. The fresh fixture is
+July 15, 2026; the six sample stories replay July 21–26. Their summer restriction
+and labeled evidence remain meaningful even when presented in November.
 
 ## Rehearsal setup
 
@@ -21,6 +22,24 @@ these steps automatically. Open the local UI in three browser profiles or sign
 out between roles. Use `supervisor@example.test`, `safety@example.test`, and
 `worker@example.test`, all with `HeatShieldDemo2026!` in demo mode.
 
+Normal demo startup also loads six additive stories at `DRAFT`, `OPTIMIZED`,
+`APPROVED`, `PUBLISHED`, `REVIEW_REQUIRED` and `WITHDRAWN`. As safety officer,
+start on the operations dashboard and select a shift to inspect its retained
+curve and findings. The dashboard totals come from stored data and fresh checks,
+not presentation constants. The missing-evidence/cooling story shows why no
+admissible proposal exists. Unknown worker details remain “Not recorded.”
+
+The worker already has pending, acknowledged and verified recovery examples.
+`worker-07@example.test` separately demonstrates a stop-work hold, leaving the
+normal six fixture workers available. Supervisors see a minimal human-review
+alert, not the private symptom text. Seeded actions are demonstration examples,
+not evidence that an actual person approved a shift or completed recovery.
+
+If sample content was disabled, set `HEATSHIELD_DEMO_CONTENT=true` before demo
+startup or use the safety/admin-only `POST /api/v1/demo/load` with `{}` in demo
+mode. Loading is additive: it preserves existing edits, withdrawals, holds and
+queued jobs. It does not reset prior rehearsal actions.
+
 Prepare a fresh scenario for the recording rather than reusing a published
 scenario with completed interventions. As safety officer, withdraw any prior
 published demonstration plan that uses the same workers and times; overlapping
@@ -36,8 +55,8 @@ true `FEASIBLE`/`UNKNOWN` state instead of narrating an optimal result.
 
 | Time | Action and narration | Visible evidence |
 | --- | --- | --- |
-| 0:00–0:20 | “A warning alone does not rearrange a shift or show that a protected break happened.” Sign in as supervisor. | Synthetic labels; separate worker, supervisor and safety roles |
-| 0:20–0:45 | Load the demo fixture and create a persisted scenario. Inspect the original roster. | Local restriction overlap, work/recovery findings, source and policy labels |
+| 0:00–0:20 | “A warning alone does not rearrange a shift or show that a protected break happened.” Sign in as supervisor and show the populated operations workspace. | Computed protection totals, selected-shift WBGT replay, follow-up queue and six workflow states |
+| 0:20–0:45 | Point to the missing-evidence story, then load the normal fixture and create a fresh persisted scenario. | No invented proposal for missing data; local restriction, source and policy labels |
 | 0:45–1:10 | Request optimization. Show its persisted queued/running state while the separate worker computes it. | Run ID, scenario revision, eventual solver status and independent validator findings |
 | 1:10–1:35 | Inspect the proposed assignments, protected recovery and explicit deferrals. Compare the fixed/greedy/proposed schedules. | Computed completion and exposure-proxy figures; zero encoded violations when validation passes |
 | 1:35–1:55 | Sign in as safety officer. Review, approve and publish that exact revision. | Separate approval/publication actions and audit entries; no real-work authorization claim |
@@ -50,6 +69,10 @@ Use plain descriptions: “environmental exposure proxy,” “encoded constrain
 and “demonstration approval.” Do not describe a proxy reduction as fewer
 injuries, the demonstration policy as clinically validated, or acknowledgement
 as proof that the action happened.
+
+For a shorter walkthrough, explore the existing published story and its three
+intervention stages instead of claiming to have created those seeded actions
+live. Keep that distinction explicit when narrating.
 
 ## Recovery and evidence
 

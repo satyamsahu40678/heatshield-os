@@ -11,6 +11,7 @@ DEMO_JWT_SECRET = "heatshield-synthetic-demo-only-signing-key-change-before-depl
 class Settings:
     database_url: str = "sqlite:///./data/heatshield.db"
     demo_mode: bool = True
+    demo_content: bool = False
     jwt_secret: str = field(default=DEMO_JWT_SECRET, repr=False)
     token_lifetime_minutes: int = 60
     jwt_issuer: str = "heatshield-os"
@@ -39,9 +40,14 @@ class Settings:
         if demo_value not in {"true", "false", "1", "0", "yes", "no"}:
             raise ValueError("HEATSHIELD_DEMO must be true or false")
         demo = demo_value in {"true", "1", "yes"}
+        content_value = os.getenv("HEATSHIELD_DEMO_CONTENT", "true" if demo else "false")
+        content_value = content_value.strip().lower()
+        if content_value not in {"true", "false", "1", "0", "yes", "no"}:
+            raise ValueError("HEATSHIELD_DEMO_CONTENT must be true or false")
         return cls(
             database_url=os.getenv("HEATSHIELD_DATABASE_URL", cls.database_url),
             demo_mode=demo,
+            demo_content=demo and content_value in {"true", "1", "yes"},
             jwt_secret=os.getenv("HEATSHIELD_JWT_SECRET", DEMO_JWT_SECRET if demo else ""),
             token_lifetime_minutes=int(os.getenv("HEATSHIELD_TOKEN_LIFETIME_MINUTES", "60")),
             jwt_issuer=os.getenv("HEATSHIELD_JWT_ISSUER", "heatshield-os"),

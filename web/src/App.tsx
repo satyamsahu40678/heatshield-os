@@ -3,10 +3,11 @@ import type { ButtonHTMLAttributes, FormEvent, ReactNode } from 'react'
 import {
   Activity, ArrowDownToLine, ArrowLeft, ArrowRight, Bell, Check, CheckCircle2,
   ChevronRight, CircleHelp, ClipboardCheck, Clock3, FileJson2, Flame,
-  History, LayoutDashboard, LoaderCircle, LogOut, Menu, Plus, RefreshCw,
+  History, LayoutDashboard, LoaderCircle, LogOut, RefreshCw,
   ShieldCheck, ShieldHalf, SlidersHorizontal, ThermometerSun, Users, X,
 } from 'lucide-react'
 import { getSession, request, setSession } from './api'
+import Dashboard from './Dashboard'
 import type {
   AuditEvent, Comparison, ComparisonRow, Finding, Intervention, Run, Scenario,
   ScenarioDetail, ScenarioSummary, Schedule, Session, Validation, WorkerSchedule,
@@ -58,7 +59,6 @@ export default function App() {
   const [screen, setScreen] = useState<Screen>(getSession()?.user.role === 'worker' ? 'worker' : 'overview')
   const [selectedId, setSelectedId] = useState('')
   const [initialDetail, setInitialDetail] = useState<ScenarioDetail | null>(null)
-  const [menu, setMenu] = useState(false)
   const [sessionError, setSessionError] = useState('')
   useEffect(() => {
     const expired = () => { updateSession(null); setSessionError('Your session expired. Sign in again to continue.'); setSelectedId('') }
@@ -67,18 +67,22 @@ export default function App() {
   }, [])
   useEffect(() => { if (session) void request('/auth/me').catch(() => {}) }, [session?.access_token])
   function signedIn(value: Session) { updateSession(value); setScreen(value.user.role === 'worker' ? 'worker' : 'overview'); setSessionError('') }
-  function navigate(next: Screen) { setScreen(next); setMenu(false) }
+  function navigate(next: Screen) { setScreen(next) }
   function openScenario(id: string, detail: ScenarioDetail | null = null) { setSelectedId(id); setInitialDetail(detail); navigate('scenario') }
   async function logout() { try { await request('/auth/logout', 'POST', {}) } catch { /* Local sign-out must also work if the connection is lost. */ } finally { setSession(null); updateSession(null); setSelectedId(''); setSessionError('') } }
   if (!session) return <Login onSession={signedIn} initialError={sessionError} />
   const worker = session.user.role === 'worker'
   const navigation = worker ? [{ id: 'worker', label: 'My schedule', icon: <ClipboardCheck size={19} /> }, { id: 'symptoms', label: 'Report symptoms', icon: <Activity size={19} /> }] : [{ id: 'overview', label: 'Overview', icon: <LayoutDashboard size={19} /> }, { id: 'interventions', label: 'Interventions', icon: <ShieldCheck size={19} /> }, { id: 'audit', label: 'Audit', icon: <History size={19} /> }]
-  return <div className="app-shell">
-    {menu && <button className="mobile-backdrop" aria-label="Close navigation" onClick={() => setMenu(false)} />}
-    <aside className={`sidebar ${menu ? 'open' : ''}`}><Logo /><div className="workspace-label">DEMO WORKSPACE</div><nav aria-label="Main navigation">{navigation.map(item => <button key={item.id} className={screen === item.id || (item.id === 'overview' && (screen === 'new' || screen === 'scenario')) ? 'active' : ''} onClick={() => navigate(item.id as Screen)}>{item.icon}{item.label}{item.id === 'overview' && <span className="nav-dot" />}</button>)}</nav><div className="sidebar-note"><div className="sidebar-note-icon"><ShieldCheck size={21} /></div><strong>Evidence. Action.<br />Accountability.</strong><p>Every proposal is checked independently. Every intervention has a human owner.</p><span>REVIEW PROTOTYPE · V0.2</span></div><div className="sidebar-bottom"><div className="avatar">{session.user.display_name?.slice(0, 2).toUpperCase() || session.user.email.slice(0, 2).toUpperCase()}</div><div><strong>{session.user.display_name || session.user.email.split('@')[0]}</strong><span>{ROLE_LABELS[session.user.role]}</span></div><button aria-label="Sign out" title="Sign out" onClick={() => void logout()}><LogOut size={19} /></button></div></aside>
-    <div className="main-column"><header className="topbar"><div className="breadcrumbs"><button className="icon-button mobile-menu" aria-label="Open navigation" onClick={() => setMenu(true)}><Menu size={20} /></button><span>Workspace</span><ChevronRight size={14} /><strong>{screen === 'scenario' ? 'Scenario planning' : screen === 'new' ? 'New scenario' : navigation.find(item => item.id === screen)?.label}</strong></div><div className="topbar-right"><Badge tone="amber"><span className="status-dot" />Synthetic demo</Badge><span className="timezone-label">Abu Dhabi · UTC+4</span><span className="topbar-divider" /><CircleHelp size={19} aria-label="Review prototype" /></div></header>
+  return <div className={`app-shell operations-shell ${worker ? 'worker-shell' : ''}`}>
+    <header className="command-header">
+      <Logo compact />
+      <nav className="command-navigation" aria-label="Main navigation">{navigation.map(item => <button key={item.id} className={screen === item.id || (item.id === 'overview' && (screen === 'new' || screen === 'scenario')) ? 'active' : ''} onClick={() => navigate(item.id as Screen)}>{item.icon}{item.label}</button>)}</nav>
+      <div className="command-account"><Badge tone="amber"><span className="status-dot" />Synthetic demo</Badge><div className="command-user"><div className="avatar">{session.user.display_name?.split(' ').map(part => part[0]).slice(0, 2).join('') || 'HS'}</div><div><strong>{session.user.display_name || session.user.email.split('@')[0]}</strong><span>{ROLE_LABELS[session.user.role]}</span></div></div><button className="command-logout" aria-label="Sign out" title="Sign out" onClick={() => void logout()}><LogOut size={19} /></button></div>
+    </header>
+    <div className="command-subbar"><div className="breadcrumbs"><span>Operations workspace</span><ChevronRight size={14} /><strong>{screen === 'scenario' ? 'Scenario planning' : screen === 'new' ? 'New scenario' : navigation.find(item => item.id === screen)?.label}</strong></div><span><ShieldCheck size={14} /> Review prototype. Every action stays accountable.</span></div>
+    <div className="main-column">
       <main className="page-content">
-        {screen === 'overview' && !worker && <Overview onNew={() => navigate('new')} onOpen={openScenario} />}
+        {screen === 'overview' && !worker && <Dashboard onNew={() => navigate('new')} onOpen={openScenario} onInterventions={() => navigate('interventions')} onAudit={() => navigate('audit')} />}
         {screen === 'new' && !worker && <ScenarioEditor onBack={() => navigate('overview')} onSaved={detail => openScenario(detail.id, detail)} />}
         {screen === 'scenario' && !worker && <ScenarioPage key={selectedId} id={selectedId} initialDetail={initialDetail} role={session.user.role} onBack={() => navigate('overview')} />}
         {screen === 'interventions' && !worker && <InterventionsPage role={session.user.role} />}
@@ -88,22 +92,6 @@ export default function App() {
       </main><footer className="app-footer"><span><ShieldCheck size={14} /> Synthetic planning & intervention prototype</span><span>Demo review does not authorize real work.</span></footer>
     </div>
   </div>
-}
-
-function Overview({ onNew, onOpen }: { onNew: () => void; onOpen: (id: string) => void }) {
-  const [scenarios, setScenarios] = useState<ScenarioSummary[] | null>(null)
-  const action = useAction()
-  const load = () => action.perform(async () => { setScenarios(items(await request<ScenarioSummary[] | { items: ScenarioSummary[] }>('/scenarios'))) })
-  useEffect(() => { void load() }, [])
-  const published = scenarios?.filter(item => item.status.toUpperCase() === 'PUBLISHED').length || 0
-  const reviewed = scenarios?.filter(item => ['APPROVED', 'REVIEWED', 'PUBLISHED', 'WITHDRAWN'].includes(item.status.toUpperCase())).length || 0
-  return <><div className="page-heading"><div><div className="eyebrow">PLANNING & PROTECTION</div><h1>A clearer plan. A protected team.</h1><p>Move from heat evidence to accountable action.</p></div><Button onClick={onNew}><Plus size={17} />New scenario</Button></div><ErrorBox>{action.error}</ErrorBox>
-    <div className="stat-grid"><Stat icon={<LayoutDashboard size={20} />} label="Planning scenarios" value={scenarios?.length ?? '—'} detail="Versioned input snapshots" /><Stat icon={<ClipboardCheck size={20} />} label="Current demo reviews" value={scenarios ? reviewed : '—'} detail="Human review, bound to a revision" tone="amber" /><Stat icon={<ShieldCheck size={20} />} label="Published demo plans" value={scenarios ? published : '—'} detail="Available in worker schedules" tone="teal" /></div>
-    <div className="overview-callout"><div className="callout-icon"><ThermometerSun size={30} strokeWidth={1.5} /></div><div><div className="eyebrow">FROM ALERT TO ACTION</div><h2>Heat protection is a plan you can follow.</h2><p>Compare a fixed roster with feasible alternatives. Review the evidence, reserve recovery, and verify the intervention.</p></div><div className="callout-steps"><span><span>01</span> Plan</span><span><span>02</span> Review</span><span><span>03</span> Verify</span></div></div>
-    <section className="panel"><div className="panel-heading"><div><h2>Your scenarios</h2><p>Every change creates a new revision and invalidates earlier review.</p></div><button className="icon-button" aria-label="Refresh scenarios" onClick={() => void load()} disabled={action.busy}><RefreshCw size={17} className={action.busy ? 'spin' : ''} /></button></div>
-      {!scenarios ? <Loading /> : scenarios.length === 0 ? <Empty title="Start with a scenario" icon={<FileJson2 size={27} />} action={<Button onClick={onNew}><Plus size={16} />Create your first scenario</Button>}>Load the synthetic Abu Dhabi fixture or import a scenario to explore the planning workflow.</Empty> : <div className="table-scroll"><table><thead><tr><th>Scenario</th><th>Status</th><th>Revision</th><th>Updated</th><th /></tr></thead><tbody>{scenarios.map(item => <tr key={item.id}><td><button className="table-name" onClick={() => onOpen(item.id)}><span className="table-icon"><ClipboardCheck size={18} /></span><span>{item.name}<small>{item.id.slice(0, 12)}</small></span></button></td><td><Status value={item.status} /></td><td><span className="revision">R{item.revision}</span></td><td className="muted">{stamp(item.updated_at)}</td><td><button className="icon-button" aria-label={`Open ${item.name}`} onClick={() => onOpen(item.id)}><ArrowRight size={17} /></button></td></tr>)}</tbody></table></div>}
-    </section><div className="principle-grid"><div><div className="principle-icon"><SlidersHorizontal size={19} /></div><h3>Constraints come first</h3><p>Qualification, evidence, restrictions and recovery are checked before planning objectives.</p></div><div><div className="principle-icon"><ShieldCheck size={19} /></div><h3>Independently checked</h3><p>A separate validator reconstructs the schedule from the original scenario.</p></div><div><div className="principle-icon"><Users size={19} /></div><h3>People close the loop</h3><p>Worker acknowledgement and supervisor verification are separate actions.</p></div></div>
-  </>
 }
 
 function Stat({ icon, label, value, detail, tone = '' }: { icon: ReactNode; label: string; value: ReactNode; detail: string; tone?: string }) { return <div className={`stat-card ${tone}`}><div className="stat-top"><span>{label}</span><span className="stat-icon">{icon}</span></div><strong>{value}</strong><p>{detail}</p></div> }

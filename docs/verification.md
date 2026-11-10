@@ -1,21 +1,31 @@
 # Verification record
 
-Recorded November 10, 2026 for the complete synthetic planning MVP.
+Updated November 10, 2026 for the populated operations workspace and responsive
+UI refresh. Earlier benchmark and deployment evidence is retained and identified
+separately below.
 
 ## Executed checks
 
 | Check | Result |
 | --- | --- |
-| Full Python suite, including a real PostgreSQL target | **200 passed** in 16.32 seconds |
-| PostgreSQL-specific tests within that suite | **11 passed** |
-| Ruff lint and formatting | Passed across 44 Python files |
+| Full Python suite, including a real PostgreSQL target | **223 passed** |
+| PostgreSQL-specific tests within that suite | **12 passed** |
+| Ruff lint and formatting | Passed across 48 Python files |
 | TypeScript/Vite production client | Built successfully |
-| Chromium tests against the built client and actual API/worker | **4 passed** |
-| Mobile worker layout | 390-pixel viewport; no horizontal overflow |
-| PWA privacy/offline check | 51 public assets cached; zero API responses cached; offline shell renders without cached private data |
-| Robustness benchmark | 100 synthetic scenarios across ten declared families |
-| Docker image and full Compose rehearsal | Passed; detailed record below |
-| Optional Open-Meteo adapter | Live request returned 48 context hours; no WBGT/admission claim |
+| Chromium tests against the refreshed production client and actual API/worker | **5 passed** in 15.3 seconds |
+| Operations dashboard and worker mobile layouts | 390-pixel viewport; no horizontal overflow |
+| Compose configuration and whitespace check | `docker compose config` and `git diff --check` passed |
+| Retained PWA privacy/offline baseline | 51 public assets cached; zero API responses cached; offline shell renders without cached private data |
+| Retained robustness benchmark | 100 synthetic scenarios across ten declared families |
+| Retained Docker image and full Compose rehearsal | Passed for the earlier release baseline; detailed record below |
+| Retained optional Open-Meteo adapter check | Live request returned 48 context hours; no WBGT/admission claim |
+
+The preceding release baseline had 200 passing Python tests, including eleven
+PostgreSQL tests, and four browser tests. The refresh adds additive computed
+showcase data, protected operations aggregation and responsive presentation.
+The retained benchmark/deployment/PWA/adapter results were not remeasured for
+this visual refresh; successful Compose configuration validation is not a new
+full-stack deployment rehearsal.
 
 The Python run used an actual PostgreSQL 17 container. Tests cover migration
 upgrade/downgrade and drift, rollback/restart durability, `SKIP LOCKED`, two
@@ -32,27 +42,44 @@ The managed command sandbox stalls TestClient local event-loop wakeups;
 integration runs used the approved outer executor. Domain and benchmark checks
 also ran inside the ordinary sandbox.
 
+The new showcase and workspace API checks verify six computed synthetic stories,
+fresh validation and approval-bound protection totals, additive restart/loading,
+tenant and private-data boundaries, and preservation of custom credentials,
+token versions and revisions. An existing queued user job remains queued with
+zero attempts when sample content is enabled. The seeded hold uses the separate
+`showcase-worker-07` identity; the normal six-worker fixture can still plan and
+publish. Failed, unknown or tampered published candidates are excluded from
+protection metrics and appear as integrity follow-up items.
+
 ## Browser journey and visual evidence
 
 The production bundle was served by FastAPI, with a separate durable worker.
 The browser tests exercised:
 
-1. Safety login, scenario import, queued planning, comparison, fresh demo review
+1. A populated operations dashboard with metrics matching the authenticated API,
+   a retained WBGT curve, six workflow states, follow-up actions and responsive
+   desktop/mobile layouts. Selecting missing-evidence inputs shows the actual
+   no-proposal state, while an optimized shift opens its valid comparison.
+2. Safety login, scenario import, queued planning, comparison, fresh demo review
    and publication, worker acknowledgement, supervisor verification and audit.
    The completed journey also withdraws the plan and confirms worker removal.
-2. Worker role isolation and a narrow mobile layout.
-3. Recoverable sign-in failure.
-4. A private severe-report simulation, worker stop state, generic staff alert,
+3. Worker role isolation and a narrow mobile layout.
+4. Recoverable sign-in failure.
+5. A private severe-report simulation, worker stop state, generic staff alert,
    supervisor access restrictions and safety-role demo hold release.
 
-[Supervisor workspace](evidence/supervisor-dashboard.png) ·
-[Populated mobile worker view](evidence/worker-mobile.png)
+[Refreshed operations dashboard](evidence/operations-dashboard.png) ·
+[Mobile operations dashboard](evidence/operations-dashboard-mobile.png) ·
+[Refreshed mobile worker view](evidence/worker-mobile-v2.png)
+
+The earlier [supervisor workspace](evidence/supervisor-dashboard.png) and
+[mobile worker view](evidence/worker-mobile.png) remain baseline artifacts.
 
 Only public static assets/HTML enter the PWA cache. Protected API responses are
 excluded. Offline private-data fetching produces a visible unavailable state;
 the application does not manufacture a cached current schedule.
 
-## Deployment and persistence
+## Retained deployment and persistence baseline
 
 A real multi-stage image build installed locked dependencies with TLS
 verification and ran the API as UID **10001** with a read-only root filesystem.
@@ -66,12 +93,13 @@ job survived API/database restart and completed after worker restart with one
 attempt and independent validation passing.
 
 The retained [deployment evidence](evidence/deployment-verification.json)
-records the image and check details. The rebuilt final-source image also passed the admission/withdrawal delta:
+records the image and check details for that baseline. Its rebuilt image also
+passed the admission/withdrawal delta:
 a second overlapping publication returned 409; withdrawing the first plan then
 allowed the replacement to publish. The tagged application image is a
 local build artifact; no public hosting or real-work deployment is claimed.
 
-## Computed robustness benchmark
+## Retained computed robustness benchmark
 
 [Summary](evidence/benchmark-summary.json) ·
 [Compressed complete output](evidence/benchmark-robustness-100.json.gz)
@@ -105,14 +133,17 @@ retained separately. It is not the 100-case robustness result.
 
 ## Source and CI
 
-The source and CI configuration are in
+The source and CI configuration are tracked through
 [pull request #1](https://github.com/satyamsahu40678/heatshield-os/pull/1).
 The workflow runs backend/PostgreSQL checks, production browser tests and a
-container build. Remote application test/build steps passed. The first browser
-job exposed a cleanup failure from long-lived `uv run` processes retaining the
-dependency-cache lock; CI now uses installed executables and explicit teardown.
-Consult the PR checks for the current commit; a source push alone is not a
-passing remote check.
+container build. Earlier remote application test/build steps passed; the first
+browser job exposed a cleanup failure from long-lived `uv run` processes
+retaining the dependency-cache lock, and CI was adjusted to use installed
+executables and explicit teardown.
+
+The populated-workspace UI refresh passed the local checks above. Consult the
+PR checks for remote CI on the exact published commit; earlier green steps or a
+source push alone do not establish a passing remote result for this refresh.
 
 All measurements, identities, symptoms and policy thresholds used above are
 synthetic. Crews, payroll guarantees, reviewed rolling occupational policy,

@@ -1,4 +1,5 @@
 import { expect, test, type Page, type Response } from '@playwright/test';
+import type { DemoWorkspace } from '../src/types';
 
 const DEMO_PASSWORD = 'HeatShieldDemo2026!';
 
@@ -31,6 +32,48 @@ async function completedOptimization(response: Response) {
   const run = await response.json();
   return run.status === 'COMPLETED';
 }
+
+test('the seeded command center presents real plans, evidence and human follow-up', async ({ page }, testInfo) => {
+  await page.setViewportSize({ width: 1440, height: 1050 });
+  const workspaceResponse = page.waitForResponse(response => response.url().endsWith('/api/v1/demo/workspace') && response.ok());
+  await signIn(page, 'safety@example.test');
+  const workspace = await (await workspaceResponse).json() as DemoWorkspace;
+  await expect(page.getByRole('heading', { name: workspace.worksite.name, exact: true })).toBeVisible();
+  expect(workspace.scenarios.length).toBeGreaterThanOrEqual(6);
+  await expect(page.locator('.scenario-operation-card')).toHaveCount(workspace.scenarios.length);
+  const workerMetric = page.locator('.operation-metric').filter({ has: page.getByText('Workers in the workspace', { exact: true }) });
+  await expect(workerMetric.locator('strong')).toHaveText(String(workspace.metrics.workers));
+  const recoveryMetric = page.locator('.operation-metric').filter({ has: page.getByText('Protected recovery', { exact: true }) });
+  await expect(recoveryMetric.locator('strong')).toHaveText(String(workspace.metrics.protected_recovery_minutes));
+  await expect(page.getByRole('img', { name: /WBGT observations/ })).toBeVisible();
+  await expect(page.getByText('Not recorded', { exact: true })).toBeVisible();
+  await page.screenshot({ path: testInfo.outputPath('operations-dashboard.png'), fullPage: true, animations: 'disabled' });
+  await page.setViewportSize({ width: 390, height: 844 });
+  const mobileWidth = await page.evaluate(() => ({ content: document.documentElement.scrollWidth, viewport: window.innerWidth }));
+  expect(mobileWidth.content).toBeLessThanOrEqual(mobileWidth.viewport);
+  await page.screenshot({ path: testInfo.outputPath('operations-dashboard-mobile.png'), fullPage: true, animations: 'disabled' });
+  await page.setViewportSize({ width: 1440, height: 1050 });
+  const missingEvidence = workspace.scenarios.find(scenario => scenario.status === 'REVIEW_REQUIRED');
+  expect(missingEvidence).toBeTruthy();
+  await page.getByLabel('Selected shift', { exact: true }).selectOption(missingEvidence!.id);
+  await expect(page.getByText('No WBGT observations for this shift', { exact: true })).toBeVisible();
+  await expect(page.getByText('No admissible proposal — review inputs', { exact: true })).toBeVisible();
+  const reviewReady = workspace.scenarios.find(scenario => scenario.status === 'OPTIMIZED');
+  expect(reviewReady).toBeTruthy();
+  await page.getByLabel('Selected shift', { exact: true }).selectOption(reviewReady!.id);
+  await expect(page.getByRole('img', { name: new RegExp(`WBGT observations for ${reviewReady!.name}`) })).toBeVisible();
+  await page.getByRole('button', { name: reviewReady!.name, exact: true }).click();
+  await expect(page.getByRole('heading', { name: reviewReady!.name, exact: true })).toBeVisible();
+  await expect(page.getByText('Checks passed', { exact: true }).first()).toBeVisible();
+  await page.getByRole('button', { name: 'Comparison', exact: true }).click();
+  await expect(page.getByText('Fixed roster', { exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Overview', exact: true }).click();
+  await page.getByRole('button', { name: 'Open the intervention log', exact: true }).click();
+  await expect(page.getByText(/active stop-work hold/)).toBeVisible();
+  await expect(page.getByLabel('Verification note', { exact: true }).first()).toBeVisible();
+  expect(JSON.stringify(workspace)).not.toContain('"symptoms"');
+  expect(JSON.stringify(workspace)).not.toContain('"severity"');
+});
 
 test('a reviewed demo plan is published, acknowledged and independently verified', async ({ page }, testInfo) => {
   test.setTimeout(90_000);
@@ -122,7 +165,7 @@ test('a reviewed demo plan is published, acknowledged and independently verified
   await page.getByRole('button', { name: 'Sign out', exact: true }).click();
   await signIn(page, 'worker@example.test');
   await expect(page.getByRole('region', { name: scenarioName, exact: true })).toHaveCount(0);
-  await expect(page.getByRole('heading', { name: 'No published assignments yet', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'My schedule', exact: true })).toBeVisible();
 });
 
 test('worker portal fits a narrow screen and exposes no planning controls', async ({ page }, testInfo) => {

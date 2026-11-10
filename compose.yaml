@@ -3,6 +3,7 @@ name: heatshield
 x-app-environment: &app-environment
   HEATSHIELD_DATABASE_URL: postgresql+psycopg://heatshield:${POSTGRES_PASSWORD:-heatshield-demo-only-password}@db:5432/heatshield
   HEATSHIELD_DEMO: ${HEATSHIELD_DEMO:-true}
+  HEATSHIELD_DEMO_CONTENT: ${HEATSHIELD_DEMO_CONTENT:-true}
   HEATSHIELD_JWT_SECRET: ${HEATSHIELD_JWT_SECRET:-heatshield-synthetic-demo-only-signing-key-change-before-deployment}
 
 services:

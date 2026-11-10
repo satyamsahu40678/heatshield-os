@@ -79,11 +79,20 @@ def main():
         try:
             if settings.demo_mode:
                 database.initialize()
-            with database.session() as session:
-                if args.command == "seed-demo":
+            if args.command == "seed-demo":
+                with database.session() as session:
                     users = seed_demo(session, demo_mode=settings.demo_mode)
-                    print(f"Seeded {len(users)} synthetic demo accounts.")
-                    return
+                print(f"Seeded {len(users)} synthetic demo accounts.")
+                if settings.demo_content:
+                    from .showcase import seed_showcase
+
+                    result = seed_showcase(database, demo_mode=settings.demo_mode)
+                    print(
+                        f"Showcase workspace: {len(result['created'])} added, "
+                        f"{len(result['existing'])} preserved."
+                    )
+                return
+            with database.session() as session:
                 if "@" not in args.email or not args.name.strip():
                     parser.error("Provide an email address and a display name")
                 if args.role == "worker" and not args.worker_id:

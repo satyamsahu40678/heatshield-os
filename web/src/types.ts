@@ -19,3 +19,15 @@ export interface ScenarioDetail extends ScenarioSummary { scenario: Scenario; sc
 export interface Intervention { id: string; scenario_id: string; revision?: number; worker_id: string; task_id?: string; kind?: string; status: string; instructions?: string; message?: string; starts_at?: string; ends_at?: string; acknowledged_at?: string | null; verified_at?: string | null; payload?: { starts_at?: string; ends_at?: string; timezone?: string; messages?: Record<string, string> }; events?: {id: string; type: string; note: string | null; created_at: string}[]; [key: string]: unknown }
 export interface WorkerSchedule { worker_id: string; stop_work: boolean; scenarios: { scenario_id: string; name: string; revision: number; timezone?: string; assignments: Assignment[]; recoveries: Assignment[]; interventions: Intervention[] }[] }
 export interface AuditEvent { id: string; event_type?: string; action?: string; actor_id?: string; actor_email?: string; created_at?: string; timestamp?: string; payload?: Record<string, unknown>; [key: string]: unknown }
+export interface DashboardScenario { id: string; name: string; status: string; revision: number; starts_at: string; ends_at: string; worker_count: number; task_count: number; completed_tasks: number | null; deferred_tasks: number | null; violation_count: number | null }
+export interface DemoWorkspace {
+  demo_enabled: boolean
+  worksite: { name: string; location: string; timezone: string; replay_label: string }
+  active_scenario_id: string | null
+  metrics: { workers: number; protected_recovery_minutes: number; verified_interventions: number; total_interventions: number; attention_items: number; published_plans: number }
+  curve: { observed_at: string; wbgt_c: number; zone_id: string; source: string }[]
+  scenarios: DashboardScenario[]
+  attention: { id: string; kind: string; title: string; detail: string; scenario_id: string | null; worker_id: string | null }[]
+  activity: { id: string; action: string; created_at: string; scenario_id: string | null; actor_label: string }[]
+  workers: { id: string; display_name: string; skills: string[]; acclimatized: boolean | null; status: string; work_minutes: number; recovery_minutes: number }[]
+}

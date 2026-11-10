@@ -127,6 +127,10 @@ def create_app(settings: Settings | None = None, database: Database | None = Non
             database.initialize()
             with database.session() as session:
                 seed_demo(session, demo_mode=True)
+            if settings.demo_content:
+                from .showcase import seed_showcase
+
+                seed_showcase(database, demo_mode=True)
         yield
         if owned_database:
             database.dispose()
@@ -148,6 +152,9 @@ def create_app(settings: Settings | None = None, database: Database | None = Non
     from .persistent_api import router as persistent_router
 
     application.include_router(persistent_router)
+    from .demo_api import router as demo_router
+
+    application.include_router(demo_router)
 
     @application.get("/healthz", tags=["Operations"])
     def health():

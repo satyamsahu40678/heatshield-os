@@ -23,7 +23,8 @@ PostgreSQL has no published host port. Set `HEATSHIELD_PORT` in `.env` if port
 8000 is occupied.
 
 The API migrates the database before serving requests, then creates the demo
-accounts only when `HEATSHIELD_DEMO=true`. The separate worker starts after the
+accounts only when `HEATSHIELD_DEMO=true`. By default in demo mode it also adds
+the six computed walkthroughs described below. The separate worker starts after the
 API and PostgreSQL are healthy and checks that migration heads are current.
 Both application containers use the same immutable image and database-backed
 job queue; Redis is not required. The runtime uses a non-root user and a
@@ -41,6 +42,57 @@ is **`HeatShieldDemo2026!`**. Never reuse these accounts with real data.
 
 Additional `worker-01@example.test` through `worker-06@example.test` identities
 match the six workers in the seeded planning fixture.
+`worker-07@example.test` is a separate escalation walkthrough, bound to
+`showcase-worker-07`, with the same public demo password. Its seeded stop-work
+hold does not block the six normal fixture workers.
+
+## Populated operations workspace
+
+Demo startup loads missing sample stories through the actual optimizer,
+independent validator and synthetic workflow gates:
+
+| Sample story | Retained state | Replay date |
+| --- | --- | --- |
+| Canal West · crew readiness | `DRAFT` | July 21, 2026 |
+| Port logistics · morning redesign | `OPTIMIZED` | July 22, 2026 |
+| Solar roof · reviewed shift | `APPROVED` | July 23, 2026 |
+| Al Reem · live simulation | `PUBLISHED` | July 24, 2026 |
+| East yard · cooling outage | `REVIEW_REQUIRED` | July 25, 2026 |
+| Marina works · withdrawn plan | `WITHDRAWN` | July 26, 2026 |
+
+These are synthetic replays, not current site measurements or real human safety
+authorizations. The worker account already has pending, acknowledged and
+verified recovery examples, including English/Hindi/Arabic text. The held
+seventh account demonstrates escalation without exposing raw symptoms to staff.
+
+`GET /api/v1/demo/workspace` requires a staff role and calculates the dashboard
+metrics, shift cards, WBGT curve, follow-up queue, activity and workforce from
+tenant-scoped retained records. Protection totals use fresh validation and a
+matching current review. A broken published candidate becomes a follow-up item,
+not counted protective work.
+
+Sample loading is additive. Restarting or rerunning `heatshield seed-demo`
+preserves user edits, queued jobs, acknowledgements, withdrawals, hold releases,
+passwords and token revocations. It computes only missing designated sample
+inputs and never claims an unrelated queued job. Existing user holds or active
+plan conflicts remain authoritative if a sample cannot reach its intended state.
+
+Set `HEATSHIELD_DEMO_CONTENT=false` in the environment, or in `.env` for Compose,
+to disable automatic content loading. This preserves all existing samples and
+records. A fresh development database plus that setting provides an empty
+workspace; there is no need to delete a populated database to change the flag.
+Recreate the API process/container after changing its environment.
+
+In demo mode, an authenticated safety officer or administrator in the primary
+demo organization can explicitly add missing samples with
+`POST /api/v1/demo/load` and an empty JSON body. Supervisors and workers cannot
+load content. Non-demo deployments and other organizations cannot use that
+endpoint. The flag changes automatic loading; it does not grant endpoint roles.
+
+The standalone default fixture remains July 15, 2026, so creating a normal new
+planning scenario does not overlap the seeded July 21–26 walkthroughs.
+
+## Process health and persistence
 
 ```sh
 docker compose logs --tail=100 api worker
@@ -114,7 +166,8 @@ do not switch to an unrelated remote daemon to bypass an access failure.
 | Variable | Meaning |
 | --- | --- |
 | `HEATSHIELD_DATABASE_URL` | SQLAlchemy URL, normally `postgresql+psycopg://…` for deployment |
-| `HEATSHIELD_DEMO` | Enables public synthetic accounts and demo fixtures; default `true` locally |
+| `HEATSHIELD_DEMO` | Enables public synthetic accounts and demo-only behavior; default `true` locally |
+| `HEATSHIELD_DEMO_CONTENT` | Automatically adds missing sample walkthroughs; environment default is `true` when demo mode is enabled, otherwise disabled; `false` preserves existing records |
 | `HEATSHIELD_JWT_SECRET` | Token-signing material; non-demo mode rejects the built-in demo key and requires at least 32 bytes |
 | `HEATSHIELD_TOKEN_LIFETIME_MINUTES` | Access-token lifetime, 60 minutes by default |
 | `HEATSHIELD_FRONTEND_DIST` | Compiled UI directory, `web/dist` by default |
@@ -131,6 +184,10 @@ example `.env` values are public and provide no confidentiality.
 Use a fresh deployment database or explicitly deactivate all previously seeded
 public identities. Changing `HEATSHIELD_DEMO` does not delete accounts or data
 that already exist in a persistent volume.
+Changing `HEATSHIELD_DEMO_CONTENT` likewise does not remove sample scenarios or
+reset their state. The settings constructor keeps content disabled unless
+explicitly requested by code; normal environment-based application startup
+uses the demo-aware default described above.
 
 After migrations, provision each authorized identity through the private
 password prompt. Worker identities also require their scenario worker binding:

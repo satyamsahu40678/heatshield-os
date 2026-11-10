@@ -43,6 +43,36 @@ pytestmark = pytest.mark.skipif(
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 
+def test_populated_showcase_is_additive_and_does_not_drain_a_user_job(pg_database):
+    from heatshield.bootstrap import seed_demo
+    from heatshield.demo_api import Workspace, build_workspace
+    from heatshield.settings import Settings
+    from heatshield.showcase import STORIES, seed_showcase
+
+    with pg_database.session() as session:
+        seed_demo(session)
+        admin = session.scalar(select(User).where(User.email == "admin@example.test"))
+        record = workflows.create_scenario(session, admin, "Existing queued work", _scenario())
+        queued = workflows.enqueue_optimization(session, admin, record["id"], 1, "existing-job")
+    first = seed_showcase(pg_database)
+    assert len(first["created"]) == 6 and not first["warnings"]
+    second = seed_showcase(pg_database)
+    assert not second["created"] and len(second["existing"]) == 6
+    with pg_database.session() as session:
+        run = session.get(OptimizationRun, queued["id"])
+        assert run.status == "QUEUED" and run.attempts == 0 and run.result_json is None
+        assert {
+            marker: session.get(ScenarioRecord, marker).status for marker, _, _, _ in STORIES
+        } == {marker: state for marker, _, _, state in STORIES}
+        safety = session.scalar(select(User).where(User.email == "safety@example.test"))
+        workspace = Workspace.model_validate(
+            build_workspace(session, safety, Settings(demo_content=True))
+        )
+        assert workspace.metrics.published_plans == 1
+        assert workspace.metrics.protected_recovery_minutes > 0
+        assert workspace.metrics.total_interventions > workspace.metrics.verified_interventions > 0
+
+
 def _alembic_config() -> Config:
     return Config(str(PROJECT_ROOT / "alembic.ini"))
 

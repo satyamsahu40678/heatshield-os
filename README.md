@@ -14,24 +14,50 @@ and publication cannot authorize real work.
 Requires Docker with Compose.
 
 ```sh
-cp .env.example .env
+cp -n .env.example .env
 docker compose up --build
 ```
 
 Open <http://localhost:8000>. Compose starts PostgreSQL, applies migrations,
-creates demo identities, and starts the API and worker. Data survives normal
-container restarts in a named PostgreSQL volume.
+creates demo identities and a populated sample workspace, and starts the API
+and worker. Data survives normal container restarts in a named PostgreSQL volume.
 
 Use `safety@example.test`, `supervisor@example.test`, or `worker@example.test`
 with the public demo password **`HeatShieldDemo2026!`**. These fixture identities
-exist only in demo setup. Start with the safety officer: create a scenario,
-load the fixture, generate a plan, record demo review and publish it. Switch to
-the worker to acknowledge recovery, then the supervisor to verify it.
+exist only in demo setup. The safety officer opens a populated operations
+dashboard. Inspect any sample shift, then switch to the worker to acknowledge
+recovery or the supervisor to verify a received instruction. You can also
+create your own scenario and use the complete planning/review/publication flow.
 
 For managed environments with an HTTPS inspection proxy, use
 `scripts/build-image.sh` to pass optional CA build secrets, followed by
 `docker compose up`. See [deployment instructions](docs/deployment.md) for
 configuration, backups, migrations, non-demo provisioning and cleanup.
+
+## Explore the populated demo
+
+Demo startup adds six walkthroughs: draft inputs, an optimized proposal,
+a reviewed shift, a published plan, a missing-evidence/cooling case requiring
+review, and a withdrawn historical plan. Results are computed by the actual
+optimizer and checked independently. The dashboard derives its metrics, WBGT
+curve, follow-up queue, team roster and activity from those stored records.
+
+[Desktop preview](docs/evidence/operations-dashboard.png) ·
+[Worker mobile preview](docs/evidence/worker-mobile-v2.png)
+
+The worker account opens published recovery instructions at pending,
+acknowledged and verified stages, with English/Hindi/Arabic text. A separate
+`worker-07@example.test` account demonstrates an active stop-work hold without
+blocking the six normal planning-fixture workers. It uses the same public demo
+password. Supervisors see a generic alert, not private symptom details.
+
+Seeding is additive: rerunning startup or `heatshield seed-demo` preserves your
+scenario edits, queued jobs, acknowledgements, withdrawals, hold releases and
+credentials. It never resets the database. Set `HEATSHIELD_DEMO_CONTENT=false`
+to disable automatic sample loading; existing samples remain. An authenticated
+safety officer or administrator can explicitly add missing samples through
+`POST /api/v1/demo/load` with an empty JSON body. Non-demo deployments cannot
+load the showcase.
 
 ## What works
 

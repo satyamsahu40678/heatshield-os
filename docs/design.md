@@ -242,6 +242,8 @@ a hash of the exact proposed schedule.
 | `GET /api/v1/workers/holds`, `POST /api/v1/workers/{id}/release-hold` | Minimal staff escalation list and safety-role demo release |
 | `GET /api/v1/weather/context` | Optional environmental screening data that cannot admit heat work |
 | `GET /api/v1/demo/scenario` | Staff-authenticated synthetic example |
+| `GET /api/v1/demo/workspace` | Staff-only tenant-scoped operations aggregation from retained inputs, validated proposals and current workflow state |
+| `POST /api/v1/demo/load` | Safety/admin-only additive sample loading in the primary demo organization; unavailable outside demo mode |
 | `POST /api/v1/scenarios/validate`, `.../optimize` | Staff-authenticated stateless core tools retained for compatibility |
 
 Roles and tenant/worker bindings are loaded from the database for each bearer
@@ -328,6 +330,35 @@ symptoms. Server authorization remains authoritative even when the UI hides an
 action. Errors and stale-revision conflicts remain visible rather than turning
 into optimistic success.
 
+The operations dashboard calculates workforce, protected recovery, intervention
+progress and follow-up counts from current tenant records. It exposes the
+selected shift's retained WBGT curve, scenario states, generic attention queue,
+team roster and audit activity. Protection totals require a completed feasible
+run, fresh independent validation and matching current approval hashes. Failed,
+unknown or tampered published candidates become integrity follow-up items and
+are excluded from protective-work totals. Aggregation never includes raw health
+symptoms, severity, credentials or another tenant's records. Missing workforce
+attributes remain unknown rather than becoming invented qualifications or
+acclimatization classifications.
+
+Environment-driven demo startup automatically adds six computed sample stories
+covering `DRAFT`, `OPTIMIZED`, `APPROVED`, `PUBLISHED`, `REVIEW_REQUIRED` and
+`WITHDRAWN`. Each uses a distinct July 21–26 replay date. Sample computation uses
+only designated new fixture inputs; it never drains the durable user queue.
+Deterministic sample IDs and additive transactions preserve existing revisions,
+acknowledgements, withdrawals, hold releases and customized credentials. Seeded
+reviews/events are synthetic walkthrough actions, not actual human approval.
+The separate `showcase-worker-07` hold leaves the normal six fixture workers
+available for the independent July 15 planning journey.
+
+`HEATSHIELD_DEMO_CONTENT` defaults to enabled through `Settings.from_env` when
+`HEATSHIELD_DEMO=true`, and is disabled outside demo mode. Setting it false stops
+automatic additions without removing existing data. Direct `Settings(...)`
+construction defaults content to false, keeping explicit test/application
+configuration free of unexpected sample data. The loading endpoint requires a
+safety/admin role and the primary demo organization independently of the
+automatic-loading flag.
+
 The service worker caches the public app shell and static assets only. It does
 not cache authenticated API responses or queue offline acknowledgements or
 other mutations. Session storage and content-security controls are documented
@@ -373,6 +404,11 @@ The usable MVP release gate requires a fresh setup, passing backend/security and
 PostgreSQL checks, an exercised browser planning-to-intervention journey, a
 working API/worker/database deployment, and retained benchmark evidence. Building
 the frontend or container alone does not demonstrate the complete journey.
+
+The populated-workspace refresh passed 223 Python tests, including twelve real
+PostgreSQL tests, and five production Chromium journeys. The earlier measured
+robustness benchmark and Compose/persistence rehearsal remain baseline evidence;
+they are identified separately from this refresh in [verification](verification.md).
 
 ## 12. Explicit extensions beyond this MVP
 
