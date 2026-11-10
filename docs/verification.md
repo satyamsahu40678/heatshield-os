@@ -108,8 +108,11 @@ retained separately. It is not the 100-case robustness result.
 The source and CI configuration are in
 [pull request #1](https://github.com/satyamsahu40678/heatshield-os/pull/1).
 The workflow runs backend/PostgreSQL checks, production browser tests and a
-container build. Consult the PR checks for the current commit; a source push
-alone is not a passing remote check.
+container build. Remote application test/build steps passed. The first browser
+job exposed a cleanup failure from long-lived `uv run` processes retaining the
+dependency-cache lock; CI now uses installed executables and explicit teardown.
+Consult the PR checks for the current commit; a source push alone is not a
+passing remote check.
 
 All measurements, identities, symptoms and policy thresholds used above are
 synthetic. Crews, payroll guarantees, reviewed rolling occupational policy,

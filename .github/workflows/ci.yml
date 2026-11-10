@@ -1,6 +1,7 @@
 name: Verify HeatShield OS
 on:
   push:
+    branches: [main]
   pull_request:
 permissions:
   contents: read
@@ -67,8 +68,10 @@ jobs:
         run: |
           uv run heatshield migrate
           uv run heatshield seed-demo
-          uv run heatshield serve --host 127.0.0.1 --port 8000 > /tmp/heatshield-api.log 2>&1 &
-          uv run heatshield worker --poll-seconds 0.2 > /tmp/heatshield-worker.log 2>&1 &
+          .venv/bin/heatshield serve --host 127.0.0.1 --port 8000 > /tmp/heatshield-api.log 2>&1 &
+          echo $! > /tmp/heatshield-api.pid
+          .venv/bin/heatshield worker --poll-seconds 0.2 > /tmp/heatshield-worker.log 2>&1 &
+          echo $! > /tmp/heatshield-worker.pid
           for attempt in {1..40}; do
             if curl --fail --silent http://127.0.0.1:8000/readyz; then break; fi
             sleep 1
@@ -87,6 +90,15 @@ jobs:
             web/playwright-report
             /tmp/heatshield-api.log
             /tmp/heatshield-worker.log
+      - name: Stop test processes before dependency-cache cleanup
+        if: always()
+        run: |
+          for pid_file in /tmp/heatshield-api.pid /tmp/heatshield-worker.pid; do
+            if [ -f "$pid_file" ]; then
+              read -r process_pid < "$pid_file"
+              kill "$process_pid" || true
+            fi
+          done
   container:
     runs-on: ubuntu-latest
     steps:

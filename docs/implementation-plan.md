@@ -238,7 +238,9 @@ outside the present release.
 - [x] Complete API/worker/PostgreSQL Compose journey and persistent restart rehearsal.
 - [x] Recheck the final-source container conflict/withdrawal delta.
 - [x] Reconcile the final verification record and publish source/evidence to PR #1.
-- [ ] Confirm remote CI on the final source revision; publication alone is not a passing CI result.
+- [x] Exercise remote backend, browser and container checks; stop background test
+  processes explicitly before dependency-cache cleanup. The current PR checks
+  remain authoritative for the final source revision.
 
 The calendar below preserves the original dependency plan. Much of its
 implementation landed by November 10; these rows are working targets, not a
