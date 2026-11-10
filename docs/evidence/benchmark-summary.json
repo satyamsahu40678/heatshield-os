@@ -1,0 +1,36 @@
+{
+  "count": 100,
+  "suite": "robustness",
+  "family_counts": {
+    "nominal": 10,
+    "hotter": 10,
+    "no_cooling": 10,
+    "sensor_outage": 10,
+    "skill_shortage": 10,
+    "short_availability": 10,
+    "new_workers": 10,
+    "tight_deadlines": 10,
+    "forecast_only": 10,
+    "conflicting_readings": 10
+  },
+  "solver_status_counts": {
+    "OPTIMAL": 22,
+    "FEASIBLE": 33,
+    "INFEASIBLE": 45
+  },
+  "validated_proposal_count": 55,
+  "invalid_returned_proposal_count": 0,
+  "cp_sat_runtime_median_seconds": 0.34578493849949155,
+  "cp_sat_runtime_p95_seconds": 2.0322950299980223,
+  "paired_exposure_proxy": {
+    "count": 36,
+    "mean_cp_minus_greedy": -1877.0833333333333,
+    "bootstrap_95_percent_interval": [
+      -2481.25,
+      -1331.25
+    ],
+    "note": "Paired software exposure-proxy differences only; lower is preferred. No health effect."
+  },
+  "raw_sha256": "276d1325382cab8617e08cb7803cdd8837ad0d69ba0fcdd53ddcb59f830ea64a",
+  "archive_sha256": "7883eaaa1cd70ba5054e42f0760b699f845a180b03b0c4a6982cc1a484289670"
+}

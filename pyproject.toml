@@ -1,0 +1,42 @@
+[build-system]
+requires = ["hatchling>=1.27,<2"]
+build-backend = "hatchling.build"
+
+[project]
+name = "heatshield-os"
+version = "0.1.0"
+description = "Synthetic occupational heat planning and independent schedule validation"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+  "alembic>=1.14,<2",
+  "fastapi>=0.115,<1",
+  "httpx>=0.27,<1",
+  "ortools>=9.11,<10",
+  "psycopg[binary]>=3.2,<4",
+  "pydantic>=2.10,<3",
+  "PyJWT>=2.10,<3",
+  "SQLAlchemy>=2.0,<3",
+  "uvicorn>=0.30,<1",
+  "tzdata>=2025.1",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<10", "httpx>=0.27,<1", "ruff>=0.9,<1"]
+
+[project.scripts]
+heatshield = "heatshield.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/heatshield"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]

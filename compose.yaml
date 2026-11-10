@@ -1,0 +1,71 @@
+name: heatshield
+
+x-app-environment: &app-environment
+  HEATSHIELD_DATABASE_URL: postgresql+psycopg://heatshield:${POSTGRES_PASSWORD:-heatshield-demo-only-password}@db:5432/heatshield
+  HEATSHIELD_DEMO: ${HEATSHIELD_DEMO:-true}
+  HEATSHIELD_DEMO_CONTENT: ${HEATSHIELD_DEMO_CONTENT:-true}
+  HEATSHIELD_JWT_SECRET: ${HEATSHIELD_JWT_SECRET:-heatshield-synthetic-demo-only-signing-key-change-before-deployment}
+
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: heatshield
+      POSTGRES_USER: heatshield
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-heatshield-demo-only-password}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U heatshield -d heatshield"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+
+  api:
+    image: heatshield-os:local
+    build: .
+    environment: *app-environment
+    ports:
+      - "127.0.0.1:${HEATSHIELD_PORT:-8000}:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    init: true
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    restart: unless-stopped
+
+  worker:
+    image: heatshield-os:local
+    command: [worker]
+    environment: *app-environment
+    depends_on:
+      db:
+        condition: service_healthy
+      api:
+        condition: service_healthy
+    # A running worker and reachable database are checked separately from HTTP.
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "from sqlalchemy import text; from heatshield.database import Database; from heatshield.settings import Settings; Database(Settings.from_env().database_url).engine.connect().execute(text('SELECT 1'))"
+      interval: 10s
+      timeout: 5s
+      start_period: 5s
+      retries: 6
+    init: true
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    restart: unless-stopped
+
+volumes:
+  postgres-data:

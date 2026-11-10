@@ -1,0 +1,11 @@
+{
+  "name": "HeatShield OS · Worker Planning",
+  "short_name": "HeatShield",
+  "description": "Synthetic heat planning and worker intervention prototype. Demo review does not authorize actual work.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f4f6f6",
+  "theme_color": "#142d3a",
+  "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}

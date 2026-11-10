@@ -1,0 +1,33 @@
+export type Role = 'admin' | 'safety_officer' | 'supervisor' | 'worker'
+export interface User { id: string; email: string; display_name: string; role: Role; organization_id: string; worker_id: string | null }
+export interface Session { access_token: string; token_type: string; user: User }
+export interface Worker { id: string; skills: string[]; available_from: string; available_until: string; acclimatized: boolean }
+export interface Task { id: string; required_skill: string; zone_id: string; duration_minutes: number; release_at: string; deadline: string; deferrable: boolean; outdoors: boolean; heat_exposed: boolean; workload: string }
+export interface Observation { id: string; zone_id: string; observed_at: string; valid_from: string; valid_until: string; wbgt_c: number; source: string; quality: string; calibration_reference: string | null }
+export interface Policy { id: string; version: string; demo_only: true; restricted_start: string; restricted_end: string; restricted_season_start: string; restricted_season_end: string; recovery_minutes: number; max_observation_age_minutes: number; wbgt_limits_c: Record<string, number>; source_urls: string[]; [key: string]: unknown }
+export interface Scenario { id: string; schema_version: string; mode: 'synthetic'; timezone: string; starts_at: string; ends_at: string; slot_minutes: number; cooling_capacity: number; policy: Policy; workers: Worker[]; tasks: Task[]; observations: Observation[]; solver_time_limit_seconds: number; seed: number }
+export interface Assignment { task_id: string; worker_id: string; starts_at: string; ends_at: string }
+export interface Schedule { scenario_hash: string; policy_hash: string; assignments: Assignment[]; recoveries: Assignment[]; deferred_task_ids: string[] }
+export interface Finding { code: string; message: string; task_id: string | null; worker_id: string | null }
+export interface Validation { valid: boolean; review_required: true; operational_approval_allowed: false; violations: Finding[]; review_findings: Finding[]; completed_tasks: number; deferred_tasks: number; exposure_proxy: number; workload_spread_minutes: number }
+export interface OptimizationResult { status: string; review_required: true; operational_approval_allowed: false; schedule: Schedule | null; validation: Validation | null; metadata: { solver_version: string; seed: number; elapsed_seconds: number; candidate_count: number; stages: {name: string; status: string; value: number | null; best_bound: number | null}[] }; diagnostics: string[] }
+export interface ComparisonRow { status: string; elapsed_seconds?: number; validation: Validation | null; [key: string]: unknown }
+export interface Comparison { fixed?: ComparisonRow; greedy?: ComparisonRow; optimized?: ComparisonRow; b0_fixed?: ComparisonRow; b1_greedy?: ComparisonRow; b2_cp_sat?: ComparisonRow; [key: string]: unknown }
+export interface Run { id: string; scenario_id: string; revision: number; status: 'QUEUED' | 'RUNNING' | 'COMPLETED' | 'FAILED'; solver_status: string | null; result: OptimizationResult | null; comparison: Comparison | null; attempts: number; error: string | null; created_at: string; updated_at: string }
+export interface ScenarioSummary { id: string; name: string; revision: number; status: string; latest_run_id: string | null; created_at: string; updated_at: string }
+export interface ScenarioDetail extends ScenarioSummary { scenario: Scenario; scenario_hash: string; policy_hash: string; latest_run: Run | null; approval: Record<string, unknown> | null; published_at: string | null }
+export interface Intervention { id: string; scenario_id: string; revision?: number; worker_id: string; task_id?: string; kind?: string; status: string; instructions?: string; message?: string; starts_at?: string; ends_at?: string; acknowledged_at?: string | null; verified_at?: string | null; payload?: { starts_at?: string; ends_at?: string; timezone?: string; messages?: Record<string, string> }; events?: {id: string; type: string; note: string | null; created_at: string}[]; [key: string]: unknown }
+export interface WorkerSchedule { worker_id: string; stop_work: boolean; scenarios: { scenario_id: string; name: string; revision: number; timezone?: string; assignments: Assignment[]; recoveries: Assignment[]; interventions: Intervention[] }[] }
+export interface AuditEvent { id: string; event_type?: string; action?: string; actor_id?: string; actor_email?: string; created_at?: string; timestamp?: string; payload?: Record<string, unknown>; [key: string]: unknown }
+export interface DashboardScenario { id: string; name: string; status: string; revision: number; starts_at: string; ends_at: string; worker_count: number; task_count: number; completed_tasks: number | null; deferred_tasks: number | null; violation_count: number | null }
+export interface DemoWorkspace {
+  demo_enabled: boolean
+  worksite: { name: string; location: string; timezone: string; replay_label: string }
+  active_scenario_id: string | null
+  metrics: { workers: number; protected_recovery_minutes: number; verified_interventions: number; total_interventions: number; attention_items: number; published_plans: number }
+  curve: { observed_at: string; wbgt_c: number; zone_id: string; source: string }[]
+  scenarios: DashboardScenario[]
+  attention: { id: string; kind: string; title: string; detail: string; scenario_id: string | null; worker_id: string | null }[]
+  activity: { id: string; action: string; created_at: string; scenario_id: string | null; actor_label: string }[]
+  workers: { id: string; display_name: string; skills: string[]; acclimatized: boolean | null; status: string; work_minutes: number; recovery_minutes: number }[]
+}
